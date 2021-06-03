@@ -1,0 +1,35 @@
+package ObjectAndClass;
+
+class StudentsDetails{
+	int id,rollno ;
+	String name,department;
+	void assainvalue(int rollno,String department)
+	{
+		//Using this Keyword defining the variable
+		this.rollno = rollno;
+		this.department = department;
+	}
+	void display() {
+		System.out.println(id+" "+rollno+" "+name+" "+department );
+	}	
+}
+
+public class ObjectExample {
+
+	public static void main(String[] args) {
+			//initializing the object to StudentDetails Class
+			StudentsDetails obj1 = new StudentsDetails();
+			StudentsDetails obj2 = new StudentsDetails();
+			//initialization through reference variable
+			obj1.id = 100001;
+			obj2.id = 100002;
+			obj1.name = "Ram";
+			obj2.name = "Suresh";
+			//initialization through method
+			obj1.assainvalue(7312, "CSE");
+			obj2.assainvalue(7212, "ECE");
+			obj1.display();
+			obj2.display();
+	}
+
+}
