@@ -1,0 +1,40 @@
+package Constructor;
+
+/* It's a Block of code similar to method,it's called when an instance of the class created.
+if the constructor not define in class the compiler will call default constructor by its own
+constructor is implicitly.it means the process done by JVM not by the programmer */
+
+class Stock{
+	int stock_qty,productId;
+	String product;
+	//Default constructor
+	Stock(){
+		System.out.println("Stock Details.....");
+	}
+	//parameterized constructor
+	Stock(int stock_qty,String product){
+		this.product = product;
+		this.stock_qty = stock_qty;
+	}
+	Stock(int stock_qty,String product,int productId){
+		this.product = product;
+		this.stock_qty = stock_qty;
+		this.productId = productId;
+	}
+	void display() {
+		System.out.println(product + " " + productId + " " + stock_qty);
+	}
+}
+public class Factory {
+
+	public static void main(String[] args) {
+		//constructor overloading
+		Stock stock1 = new Stock();
+		Stock stock2 = new Stock(100,"Pen");
+		Stock stock3 = new Stock(100,"Dairymilk",101);
+		stock2.display();
+		stock3.display();
+	}
+
+}
+

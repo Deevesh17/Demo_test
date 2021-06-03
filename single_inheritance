@@ -1,0 +1,25 @@
+package Static;
+//single inheritance
+class ChocoName{
+	static String choco_name = "Dairimilk";	
+	static int rate = 5;
+}
+class ChangeStaticvalue extends ChocoName{
+	void display() {
+		System.out.println(super.rate);
+	}
+}
+public class ChocoCount {
+
+	public static void main(String[] args) {
+		ChocoName obj1 = new ChocoName();
+		obj1.rate += 25;
+		ChangeStaticvalue obj2 = new ChangeStaticvalue();
+		System.out.println(obj2.choco_name);
+		obj2.display();
+		ChocoName obj3 = new ChocoName();
+		obj3.rate -= 5;
+		obj2.display();
+	}
+
+}

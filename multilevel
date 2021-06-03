@@ -1,0 +1,35 @@
+package Multilevel;
+
+class Addition{
+	int var1,var2;
+	int sum(int var1,int var2) {
+		return(var1 + var2);
+	}
+}
+class Subtraction extends Addition{
+	int sub(int var1,int var2) {
+		return(var1 - var2);
+	}
+}
+class Multiplication extends Subtraction{
+	int mul(int var1,int var2) {
+		return(var1 * var2);
+	}
+	void display()
+	{
+		System.out.println(super.var1 + " "+ super.var2);
+	}
+}
+public class Calculator {
+
+	public static void main(String[] args) {
+		Multiplication ml = new Multiplication();
+		System.out.println(ml.sum(58,80));
+		System.out.println(ml.sub(80,58));
+		System.out.println(ml.mul(55, 11));
+		ml.var1 = 55;
+		ml.var2 = 11;
+		ml.display();
+	}
+
+}
