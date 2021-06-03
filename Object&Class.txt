@@ -1,5 +1,6 @@
 package ObjectAndClass;
-
+//Object is instance of Class
+//Class is group of object which have common properties.it contains methods and data members
 class StudentsDetails{
 	int id,rollno ;
 	String name,department;
