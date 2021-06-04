@@ -1,0 +1,17 @@
+package Protected;
+import Encapsulation.StudentDetails;
+
+class DisplayFun extends StudentDetails{
+	void displaychild() {
+		System.out.println("Here I just extends studentdetails class and trying to access protected function");
+		displayoutsidepackage();
+	}
+}
+public class AssesingProtectedFun {
+
+	public static void main(String[] args) {
+		DisplayFun func = new DisplayFun();
+		func.displaychild();
+	}
+
+}

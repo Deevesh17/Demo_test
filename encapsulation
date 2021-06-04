@@ -5,7 +5,7 @@ package Encapsulation;
  * private - the scope will be only inside the class
  * default - scope will be within class and within package 
  * protucted - within package,within class and outside the package by subclass only */
-class Student{
+ class Student{
 	private long phone,account_details;
 	public String name,department;
 	void display() {
@@ -26,7 +26,9 @@ class Student{
 }
 
 public class StudentDetails {
-
+	protected void displayoutsidepackage() {
+		System.out.println("===================Protected Function================");
+	}
 	public static void main(String[] args) {
 		Student student = new Student();
 		student.name = "Kumar";
