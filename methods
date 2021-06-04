@@ -1,0 +1,32 @@
+package Methods;
+/* this is a block of code only runs when it is called
+ * we can pass data as parameters to do the process
+ * methods have return type
+ * this is useful to reuse the code
+ * there is two type of of functions predefined and user-defined */
+public class Functions {
+	static void sum(int number1,int number2) {
+		System.out.println(number1 + number2);
+	}
+	//Recursive function is the method call itself continuously ,it reduce time complexity but use more memory.
+	//if we forget to break the recursion the compiler throw a StackOverflowError 
+	static int recursion(int number) {
+		if(number > 0) {
+			System.out.println(number);
+		}
+		else {
+			return number;
+		}
+		return recursion(number - 1);
+	}
+	public static void main(String[] args) {
+		//Function Call
+		int number = 5;
+		//Call by value.
+		//the changes done by the called method will not affect the actual data
+		int value = recursion(number);
+		System.out.println(number + " " + value);
+		sum(25, 25);
+	}
+
+}
