@@ -1,0 +1,48 @@
+package Polymorphism;
+
+class Addition{
+	int value1,value2;
+	//Method Overloading
+	void sum() {
+		System.out.println(value1 + value2);
+	}
+	int sum(int add1,int add2)
+	{
+		return(add1 + add2);
+	}
+	double sum(double value1,double value2) {
+	
+		return(value1 + value2);
+	}
+}
+//Method Overriding
+class SquareOfAdd extends Addition{
+	int sum(int add1,int add2) {
+		int result = add1 + add2;
+		return(result * result);
+	}
+}
+
+class CubeOfAdd extends SquareOfAdd{
+	int sum(int add1,int add2) {
+		int result = add1 + add2;
+		System.out.println(result);
+		return(result * result * result);
+	}
+}
+
+public class Calculation {
+
+	public static void main(String[] args) {
+		CubeOfAdd obj = new CubeOfAdd();
+		SquareOfAdd sobj = new SquareOfAdd();
+		System.out.println(obj.sum(2, 2));
+		System.out.println(sobj.sum(2, 2));
+		System.out.println(obj.sum(2.5, 2.5));
+		obj.value1 = 2;
+		obj.value2 = 5;
+		obj.sum();
+		
+	}
+
+}

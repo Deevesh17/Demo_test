@@ -1,0 +1,50 @@
+package Abstract;
+
+/* the class which declared with keyword abstract and contains abstract method,
+ * it's a process of hiding the implementation details and showing the functionality to the user*/
+abstract class CommonWork{
+	//Constructor in abstract class it will be called when object is created for this class
+	CommonWork(){
+		System.out.println("Welcome To APK Service");
+	}
+	void oillservice() {
+		System.out.println("The amount to be paid for oillservice is... 8000 ");
+	}
+	void waterservice() {
+		System.out.println("The amount to be paid for water service is.. 5000");
+	}
+	abstract void wheelchain();
+}
+
+//class APKService extends CommonWork{
+//	void wheelchain() {
+//		System.out.println("The rate may be differ based on the chain issue");
+//	}
+//}
+
+public class Vehicle {
+
+	public static void main(String[] args) {
+		/*using upcasting we can create object for abstract class
+		 * we assigning the object of child class to parent class
+		 * the process of converting one data type to another is called typecasting
+		 * upcasting and downcasting is the type of object typecasting
+		CommonWork work = new APKService();
+		work.oillservice();
+		work.waterservice();
+		work.wheelchain();*/
+		
+		//without using upcasting we can create object to abstract class
+		
+		CommonWork work2 = new CommonWork() {
+			void wheelchain() {
+				System.out.println("Amount to be paid 500");
+			}
+		};
+		work2.oillservice();
+		work2.waterservice();
+		work2.wheelchain();
+
+	}
+
+}

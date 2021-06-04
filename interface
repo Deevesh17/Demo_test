@@ -1,0 +1,73 @@
+package Interface;
+
+/* interface contains only abstract method we cann't define the function inside the interface
+ * this is blueprint of class which can implemented in class
+ * this is used to achieve multiple inheritance in java we cann't create object for interface*/
+
+interface  CommonWork{
+	void oillservice();
+	void waterservice();
+	void stickerprinting();
+}
+
+interface Electrical{
+	void batteryStatus();
+	void lightCheck();
+}
+
+class Bike implements CommonWork,Electrical{
+	public void oillservice() {
+		System.out.println("The rate is 800 ");
+	}
+	public void waterservice() {
+		System.out.println("The rate is 900 ");
+	}
+	public void stickerprinting() {
+		System.out.println("The rate is 1000 ");
+	}
+	public void batteryStatus() {
+		System.out.println("The rate is 8000 ");
+	}
+	public void lightCheck() {
+		System.out.println("The rate is 5000 ");
+	}
+}
+
+class Car implements CommonWork,Electrical{
+	public void oillservice() {
+		System.out.println("The rate is 8000 ");
+	}
+	public void waterservice() {
+		System.out.println("The rate is 9000 ");
+	}
+	public void stickerprinting() {
+		System.out.println("The rate is 1000 ");
+	}
+	public void batteryStatus() {
+		System.out.println("The rate is 8000 ");
+	}
+	public void lightCheck() {
+		System.out.println("The rate is 5000 ");
+	}
+}
+public class Vehicle {
+
+	public static void main(String[] args) {
+		
+		Bike bike = new Bike();
+		Car car = new Car();
+		System.out.println("The Rate for Bike");
+		bike.batteryStatus();
+		bike.lightCheck();
+		bike.oillservice();
+		bike.waterservice();
+		bike.stickerprinting();
+		System.out.println("The rate for Car");
+		car.batteryStatus();
+		car.lightCheck();
+		car.oillservice();
+		car.waterservice();
+		car.stickerprinting();
+	}
+
+}
