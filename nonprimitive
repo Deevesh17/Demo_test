@@ -1,0 +1,71 @@
+package NonPrimitive;
+import java.util.Scanner;
+/*Non-primitive Data types
+ * String
+ * Array
+ * class*/
+//String is collection of character and immutable 
+public class Nonprimitive {
+
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		String subject1 = "Maths", subject2 = "Computer",splitvalue = "i am splited using space",subject3 = "MATHS",subjec4 = "ComputerScience";
+		//eg for immutable
+		subject2.concat("Scince");
+		System.out.println(subject2);
+		//still the value present in the string is Computer
+		subject2 = subject2.concat("Science");
+		System.out.println(subject2);
+		//string comparison
+		
+		System.out.println(subject1.equals(subject2));
+		System.out.println(subject1.equalsIgnoreCase(subject3));
+		System.out.println(subject2.compareTo(subjec4));//when the two strings are equal in lexicographically it provides 0
+		System.out.println(subject1.compareTo(subjec4));//when the  string1 > string2  in lexicographically it provides +ve value
+		System.out.println(subjec4.compareTo(subject1));//when the  string1 < string2  in lexicographically it provides -ve value
+		String[] string_array = splitvalue.split(" ") ;
+		for(String value : string_array) {
+			System.out.println(value);
+		}
+		System.out.println(splitvalue.length());
+		System.out.println(subjec4.charAt(5));
+		//StringBuffer is mutable
+		StringBuffer string = new StringBuffer("Marks");
+		string.append("Obtained");
+		System.out.println(string);
+		string.insert(5," ");
+		string.replace(0, 5, subjec4);
+		string.reverse();
+		System.out.println(string);
+		//StringBuffer is synchronized thread safe two thread cann't call simultaneously
+		//StringBuilder is non-synchronized not thread safe can call simultaneously
+		//Array is collection of same data type which has continuous memory allocation
+		//array store the value in index based 
+		//there is an two type of array single and multidimensional
+		//single dimensional array
+		int marks[] = new int[5];
+		System.out.println("Enter The Array Value:");
+		for(int i =0;i<5;i++) {
+			marks[i] = input.nextInt();
+		}
+		System.out.println("The Mark Obtained is:");
+		for (int mark: marks) {
+			System.out.println(mark);
+		}
+		System.out.println("MultiDimentional Array....");
+		int matrix[][] = new int[5][5];
+		System.out.println("Enter The Array Value:");
+		for(int i=0;i<5;i++){  
+			 for(int j=0;j<5;j++){  
+				 matrix[i][j] = input.nextInt();
+			 }
+		}
+		System.out.println("The value in 5X5 matrix is:");
+		for(int i=0;i<5;i++){  
+			 for(int j=0;j<5;j++){  
+			   System.out.print(matrix[i][j]+" ");  
+			 }  
+			 System.out.println();
+		}
+	}
+}

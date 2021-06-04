@@ -1,0 +1,26 @@
+package Primitive;
+/*Primitive Data types are ......
+ * boolean(default value : false )(default size: 1 bit(memory Allocation))
+ * byte (default value : 0 )(default size: 1 byte(memory Allocation))
+ * short(default value : 0)(default size: 2 byte(memory Allocation))
+ * int(default value : 0)(default size: 4 byte(memory Allocation))
+ * long(default value : 0)(default size: 8 byte(memory Allocation))
+ * float(default value : 0.0)(default size: 4 byte(memory Allocation))
+ * double(default value : 0.0)(default size: 8 byte(memory Allocation))
+ * char(default value : '\u0000')(default size: 2 byte(memory Allocation))
+ * Primitive types are predefined in java.*/
+public class PrimitiveDataType {
+
+	public static void main(String[] args) {
+		boolean bool_value = true;//there only two possible values can store true or false
+		int int_value = 55; //32bit 2's complement 
+		short short_value = 20;//16bit 2's complement  short data type is 2 times smaller than an integer saves the memory
+		long long_value = 582471632;//64bit this data type is used when we need a range of value more then integer
+		byte byte_value = 45;//8bit 2's complement  short data type is 4 times smaller than an integer saves the memory
+		float float_value = 46.23f;//used for floating point number
+		double double_value = 526.85214769d;//used for floating point number
+		char char_value = 'D';//single 16bit character
+		System.out.println(bool_value + " " + int_value + " " + short_value + " " + long_value + " " + byte_value + " " + float_value + " " + double_value + " " + char_value);
+	}
+
+}
