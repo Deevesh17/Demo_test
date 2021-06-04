@@ -1,0 +1,41 @@
+package Encapsulation;
+/*
+ * encapsulation is used to protect the data and restrict the usage of variables and methods
+ * public - there is no restriction in public asses specifier
+ * private - the scope will be only inside the class
+ * default - scope will be within class and within package 
+ * protucted - within package,within class and outside the package by subclass only */
+class Student{
+	private long phone,account_details;
+	public String name,department;
+	void display() {
+		System.out.println(name + " " + department);
+	}
+	public void providedetails(long phone,long account_details) {
+		this.account_details = account_details;
+		this.phone = phone;
+	}
+	public long return_details(String type) {
+		if(type == "phone") {
+			return(phone);
+		}
+		else {
+			return(account_details);
+		}
+	}
+}
+
+public class StudentDetails {
+
+	public static void main(String[] args) {
+		Student student = new Student();
+		student.name = "Kumar";
+		student.department = "CSE";
+		student.providedetails(701007152,1236500008);
+		student.display();
+		System.out.println(student.return_details("phone"));
+		System.out.println(student.return_details(null));
+		
+	}
+
+}
