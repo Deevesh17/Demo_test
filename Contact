@@ -1,0 +1,105 @@
+package Collections;
+
+import java.util.*;
+
+class Contact{
+	private ArrayList<HashMap> contactDetails = new ArrayList<HashMap>();
+	public void addContact(String personName,String mobileNo) {
+		HashMap<String, String> personDetails = new HashMap<String,String>();
+		personDetails.put("Name",personName);
+		personDetails.put("Mobile", mobileNo);
+		if(ExistsAndRemoveAndUpdate(mobileNo,"Exists",null,null)) {
+			contactDetails.add(personDetails);			
+		}
+		else {
+			System.err.println("\nThis Mobile Number is Already Exists and saved in another contact");
+		}
+	}
+	boolean ExistsAndRemoveAndUpdate(String mobileNo, String updateStatus,String PersonName,String newNumber) {
+		for(HashMap<String,String> listcontact: contactDetails ) {
+			if( mobileNo.equals(listcontact.get("Mobile")) && updateStatus.equals("Exists")) {
+				return false;
+			}
+			else if(mobileNo.equals(listcontact.get("Mobile")) && updateStatus.equals("remove")) {
+				contactDetails.remove(contactDetails.indexOf(listcontact));
+				return true;
+			}
+			else if(mobileNo.equals(listcontact.get("Mobile")) && updateStatus.equals("update")) {
+				if(ExistsAndRemoveAndUpdate(newNumber,"Exists",null,null)) {
+					listcontact.replace("Name", PersonName);
+					listcontact.replace("Mobile", newNumber);
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+		}
+		return true;
+		
+	}
+	public void contactList() {
+		System.out.println("\nContact Present in your Moblie are .......");
+		System.out.println("~~~~~~~~~~~~~~~~~~~");
+		for(HashMap<String,String> listcontact: contactDetails ) {
+			System.out.println("Name : " + listcontact.get("Name") + "\nMobile Number : " + listcontact.get("Mobile"));
+			System.out.println("~~~~~~~~~~~~~~~~~~~");
+		}
+	}
+}
+
+public class ListArray {
+	public static void main(String[] args) {
+		Scanner userInput = new Scanner(System.in);
+		Contact contact = new Contact();
+		int choice;
+		String personName,mobileNo,newNumber;
+		while(true) {
+			System.out.println("~~~~~~~~~~~~~~~~~~~\n1.Create Contact. \n2.Display the contact list. \n3.Remove The Contact from List.\n4.Update The Contact.\n5.Exit...\n~~~~~~~~~~~~~~~~~~~");
+			choice = userInput.nextInt();
+			if(choice == 1) {
+				System.out.println("Enter The Person Name");
+				personName = userInput.next();
+				System.out.println("Enter The Mobile Number");
+				mobileNo = userInput.next();				
+				contact.addContact(personName, mobileNo);
+			}
+			else if(choice ==2) {
+				contact.contactList();
+			}
+			else if(choice == 3) {
+				System.out.println("Enter The Mobile Number");
+				mobileNo = userInput.next();
+				if(contact.ExistsAndRemoveAndUpdate(mobileNo, "remove",null,null)) {
+					System.out.println("Contact Removed Sucessfully......");
+				}
+			}
+			else if(choice == 4) {
+				System.out.println("Enter The Person OldName");
+				userInput.next();
+				System.out.println("Enter The Person NewName");
+				personName = userInput.next();
+				System.out.println("Enter The Old Mobile Number");
+				mobileNo = userInput.next();
+				System.out.println("Enter The New Mobile Number");
+				newNumber = userInput.next();
+				if(contact.ExistsAndRemoveAndUpdate(mobileNo, "update",personName,newNumber)) {
+					System.out.println("Contact Updated Sucessfully......");
+				}
+				else {
+					System.out.println("This Mobile Number is Already Exists and Contact Not Updated Sucessfully......");
+				}
+			}
+			else if(choice == 5) {
+				System.out.println("Bye...");
+				break;
+			}
+			else {
+				System.out.println("Bye...");
+				break;
+			}
+			
+		}
+	}
+
+}
