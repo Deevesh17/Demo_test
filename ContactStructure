@@ -1,0 +1,31 @@
+package ContactApplication;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+interface ContactFunctions{
+	public void addContact();
+	public void ExistorRemoveororUpdate();
+	public void viewContactList();
+}
+
+class PersonContact{
+	private String fistName,lastName,dateOfbirth,githublink = null,nickName = null,linkedin = null,facebook = null,saveTo = null,jobTitle = null,organization = null,group = null;
+	private ArrayList<Long> phone = new ArrayList<Long>();
+	StringBuffer notes = new StringBuffer(null);
+	public void viewContactList() {
+		
+	}
+}
+public class Contact {
+
+	public static void main(String[] args) {
+		Scanner io = new Scanner(System.in);
+		ArrayList<PersonContact> conlist = new ArrayList<PersonContact>();
+		ArrayList<Long> phoneno = new ArrayList<Long>();		
+		String name,github = null;
+		int choice;
+		long mobile,newmobile;
+		StringBuffer notes = new StringBuffer();
+	}
+}
