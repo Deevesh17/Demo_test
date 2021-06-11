@@ -1,0 +1,63 @@
+package com.example.javalist;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class ArrayListClassTest3 {
+
+    ArrayListClass<String> GenericElements;
+    @Before
+    public void setUp() throws Exception {
+        GenericElements = new ArrayListClass<String>(5);
+        GenericElements.add("Employee1");
+        GenericElements.add("Employee2");
+        GenericElements.add("Employee3");
+        GenericElements.add("Employee4");
+        GenericElements.add("Employee5");
+    }
+
+    @Test
+    public void get() {
+        GenericElements.add("Employee6");
+        String actual_value = GenericElements.get(4);
+        assertEquals("Employee5",actual_value);
+    }
+
+    @Test
+    public void remove() {
+        GenericElements.add("Employee6");
+        String actual_value = GenericElements.remove(5);
+        assertEquals("Employee6",actual_value);
+    }
+
+    @Test
+    public void indexOf() {
+        GenericElements.add("Employee6");
+        GenericElements.add("Employee7");
+        int actual_value = GenericElements.indexOf("Employee8");
+        assertEquals(-1,actual_value);
+    }
+
+    @Test
+    public void clear() {
+        GenericElements.add("Employee7");
+        GenericElements.add("Employee6");
+        GenericElements.clear();
+        int actual_value = GenericElements.ArraySize();
+        assertEquals(0,actual_value);
+    }
+    @Test
+    public void ArraySize() {
+        GenericElements.add("Employee6");
+        GenericElements.add("Employee7");
+        int actual_value = GenericElements.ArraySize();
+        assertEquals(7,actual_value);
+    }
+    @Test
+    public void contains() {
+        boolean actual_value = GenericElements.contains("Employee8");
+        assertEquals(false,actual_value);
+    }
+}

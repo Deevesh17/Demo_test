@@ -1,0 +1,35 @@
+package com.example.javalist;
+
+import java.io.IOException;
+import java.util.*;
+
+public class ClassArrayList {
+
+    public static void main(String[] args) {
+        ArrayListClass<Integer> objectarray = new ArrayListClass<Integer>(5);
+        objectarray.add(1);
+        objectarray.add(2);
+        objectarray.add(3);
+        objectarray.add(4);
+        objectarray.add(5);
+        objectarray.add(6);
+        objectarray.add(85);
+        try {
+            System.out.println(objectarray.get(5));
+        } catch (Exception e) {
+            System.err.println("Error Occured " + e);
+        }
+        System.out.println(objectarray.ArraySize());
+        System.out.println(objectarray.remove(2));
+        System.out.println(objectarray.contains(5));
+        System.out.println(objectarray.ArraySize());
+        ArrayListClass nonGenricElement = new ArrayListClass();
+        nonGenricElement.add("sat");
+        nonGenricElement.add(10);
+
+//		System.out.println(nonGenricElement.remove(1));
+
+
+    }
+
+}

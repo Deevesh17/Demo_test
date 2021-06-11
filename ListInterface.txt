@@ -1,0 +1,14 @@
+package com.example.javalist;
+
+import java.io.IOException;
+
+public interface CommonFunctions<E> {
+    public void add(E e);
+    public Object[] extendSizeOfArray(Object[] actualArray, int size);
+    public void checkIndex(int index,int size);
+    public E get(int index) throws IndexOutOfBoundsException,IOException;
+    public E remove(int index);
+    public int indexOf(E e);
+    public boolean contains(E e);
+    public void clear();
+}
