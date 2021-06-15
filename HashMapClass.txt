@@ -1,0 +1,151 @@
+package com.example.javalist;
+public class HasmapClass<K,V> implements MapFunctions<K,V> {
+    class KeyValuePair<K,V>{
+        int hash_value ;
+        K key;
+        V value;
+        int size = 0;
+        KeyValuePair[] Same_index_Keys = new KeyValuePair[16];
+        public KeyValuePair(int hashValue,K key,V value){
+            this.hash_value = hashValue;
+            this.key = key;
+            this.value = value;
+        }
+        public KeyValuePair[] extendSizeOfArray(KeyValuePair[] actualArray, int size) {
+            KeyValuePair[] NewSizeArrayElement = new KeyValuePair[size];
+            for(int index = 0 ;index < actualArray.length;index++) {
+                NewSizeArrayElement[index] = actualArray[index];
+            }
+            return NewSizeArrayElement;
+        }
+        public void SameIndexKeyArray(KeyValuePair NextValue){
+            Same_index_Keys[size] = NextValue;
+            size++;
+            if(size == Same_index_Keys.length) {
+                Same_index_Keys = extendSizeOfArray(Same_index_Keys, Same_index_Keys.length * 2);
+            }
+        }
+    }
+    private KeyValuePair[] pairElement = {};
+    private KeyValuePair<K,V> keyobject;
+    private int size = 0;
+    private int default_sizee = 16;
+    public HasmapClass(){
+        this.pairElement = new KeyValuePair[16];
+    }
+    public HasmapClass(int size){
+        this.pairElement = new KeyValuePair[size];
+        this.default_sizee = size;
+    }
+    public int hash(Object key){
+        int h = key.hashCode();
+        return (h) ^ (h >>> default_sizee);
+    }
+    public void updateValue(K key,V value) {
+        int hash_value = hash(key);
+        int index = hash_value & (default_sizee - 1);
+        if(key == pairElement[index].key){
+            pairElement[index].value = value;
+        }
+        else{
+            for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
+                if(sameIndexArray != null){
+                    if(sameIndexArray.key == key){
+                        sameIndexArray.value = value;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+        public boolean ifExist(K key){
+        boolean existststus = false;
+        int hash_value = hash(key);
+        int index = hash_value & (default_sizee - 1);
+        if(key == pairElement[index].key){
+            existststus = true;
+        }
+        else{
+            for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
+                if(sameIndexArray != null){
+                    if(sameIndexArray.key == key){
+                        existststus =  true;
+                    }
+                }
+            }
+        }
+        return existststus;
+    }
+    public void put(K key,V value) {
+        int hash_value = hash(key);
+        keyobject = new KeyValuePair<K,V>(hash_value,key,value);
+        int index = hash_value & (default_sizee - 1);
+        if(pairElement[index] != null)
+        {
+            if(ifExist(key)){
+                updateValue(key,value);
+            }
+            else{
+                pairElement[index].SameIndexKeyArray(keyobject);
+                size++;
+            }
+        }
+        else{
+            pairElement[index] = keyobject;
+            size++;
+        }
+        if(size == pairElement.length) {
+            pairElement = extendSizeOfArray(pairElement, pairElement.length * 2);
+        }
+    }
+    public int Mapsize(){
+            return this.size;
+    }
+    public KeyValuePair[] extendSizeOfArray(KeyValuePair[] actualArray, int size) {
+        KeyValuePair[] NewSizeArrayElement = new KeyValuePair[size];
+        for(int index = 0 ;index < actualArray.length;index++) {
+            NewSizeArrayElement[index] = actualArray[index];
+        }
+        return NewSizeArrayElement;
+    }
+    public void print(){
+        for (int index = 0 ;index < pairElement.length;index++){
+           if (pairElement[index] != null) {
+               if (pairElement[index].Same_index_Keys.length == 0) {
+                   System.out.println(pairElement[index].key + " : " + pairElement[index].value);
+               } else {
+                   System.out.println(pairElement[index].key + " : " + pairElement[index].value);
+                   for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
+                       if(sameIndexArray != null){
+                           System.out.println(sameIndexArray.key + " : " + sameIndexArray.value);
+                       }
+                   }
+               }
+           }
+        }
+    }
+    public void clearArrayValue(){
+        for (int index = 0 ;index < pairElement.length;index++){
+            pairElement[index] = null;
+            this.size = 0;
+        }
+    }
+    public V get(K key) throws NullPointerException{
+        int hashValue = hash(key);
+        int index = hashValue & (default_sizee - 1);
+        V Value = null;
+        if(pairElement[index].hash_value == hashValue && pairElement[index].key == key){
+            return (V) pairElement[index].value;
+        }
+        else {
+            for(KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys){
+                if(sameIndexArray.hash_value == hashValue && sameIndexArray.key == key){
+                    Value =  (V) (sameIndexArray.value);
+                    break;
+                }
+            }
+        }
+        return  Value;
+    }
+
+}

@@ -1,0 +1,99 @@
+package com.example.javalist;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class HasmapClassTest {
+    HasmapClass<Integer,String> GenericIntegerkey = new HasmapClass<Integer, String>(5);
+    HasmapClass<String,Integer> GenericStringkey = new HasmapClass<String, Integer>();
+    HasmapClass NonGenericKey = new HasmapClass(5);
+    @Before
+    public void setUp() throws Exception {
+        GenericIntegerkey.put(101,"Ram");
+        GenericIntegerkey.put(102,"Ram kumar");
+        GenericIntegerkey.put(104,"Hari");
+        GenericIntegerkey.put(106,"Kiran");
+        GenericIntegerkey.put(106,"KiranKumar");
+        GenericIntegerkey.put(106,"KKumar");
+        GenericIntegerkey.put(106,"Kumar");
+        GenericStringkey.put("Dairymilk",55);
+        GenericStringkey.put("kitkat",58);
+        GenericStringkey.put("5star",100);
+        GenericStringkey.put("Eclierse",155);
+        GenericStringkey.put("BlackMilk",5);
+        GenericStringkey.put("MilkyBar",90);
+        NonGenericKey.put(2,"int");
+        NonGenericKey.put("value","String");
+        NonGenericKey.put('c',"Charecter");
+        NonGenericKey.put("Int",5);
+    }
+
+    @Test
+    public void ifExist_test_expected_true() {
+        boolean actual_value= GenericIntegerkey.ifExist(106);
+        assertEquals(true,actual_value);
+    }
+    @Test
+    public void ifExist_test_expectedTrue() {
+        boolean actual_value= GenericStringkey.ifExist("kitkat");
+        assertEquals(true,actual_value);
+    }
+    @Test
+    public void ifExist_test_expectedtrue() {
+        boolean actual_value= NonGenericKey.ifExist('c');
+        assertEquals(true,actual_value);
+    }
+
+    @Test
+    public void mapsize_test_expected_4() {
+        int actual_value = GenericIntegerkey.Mapsize();
+        assertEquals(4,actual_value);
+    }
+    @Test
+    public void mapsize_test_expected_6() {
+        int actual_value = GenericStringkey.Mapsize();
+        assertEquals(6,actual_value);
+    }
+    @Test
+    public void mapsize_test_expected4() {
+        int actual_value = NonGenericKey.Mapsize();
+        assertEquals(4,actual_value);
+    }
+    @Test
+    public void get_test_expected_float() {
+        Object actual_value = NonGenericKey.get("Int");
+        assertEquals(5,actual_value);
+    }
+    @Test
+    public void get_test_expected100() {
+        int actual_value = GenericStringkey.get("5star");
+        assertEquals(100,actual_value);
+    }
+    @Test
+    public void get_test_expected_Kumar() {
+        String actual_value = GenericIntegerkey.get(106);
+        assertEquals("Kumar",actual_value);
+    }
+    @Test
+    public void clear_test_expectedZero() {
+        GenericIntegerkey.clearArrayValue();
+        int actual_value = GenericIntegerkey.Mapsize();
+        assertEquals(0,actual_value);
+    }
+    @Test
+    public void clear_test_expected0() {
+        GenericStringkey.clearArrayValue();
+        int actual_value = GenericStringkey.Mapsize();
+        assertEquals(0,actual_value);
+    }
+    @Test
+    public void clear_test_expectedzero() {
+        NonGenericKey.clearArrayValue();
+        int actual_value = NonGenericKey.Mapsize();
+        assertEquals(0,actual_value);
+    }
+
+}

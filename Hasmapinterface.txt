@@ -1,0 +1,12 @@
+package com.example.javalist;
+
+public interface MapFunctions<K,V> {
+    public int hash(Object key);
+    public void put(K key,V value);
+    public int Mapsize();
+    public void print();
+    public void updateValue(K key,V value);
+    public boolean ifExist(K key);
+    public void clearArrayValue();
+    public V get(K key);
+}

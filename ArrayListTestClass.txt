@@ -1,0 +1,155 @@
+package com.example.javalist;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.lang.reflect.GenericArrayType;
+
+import static org.junit.Assert.*;
+
+public class ArrayListClassTest {
+    ArrayListClass<Integer> GenericElements;
+    ArrayListClass<String> GenericStringElements;
+    ArrayListClass NonGenericElements;
+
+    @Before
+    public void setUp() throws Exception {
+        GenericElements = new ArrayListClass<Integer>(5);
+        GenericElements.add(55);
+        GenericElements.add(55);
+        GenericElements.add(55);
+        GenericElements.add(55);
+        GenericElements.add(75);
+        GenericStringElements = new ArrayListClass<String>(5);
+        GenericStringElements.add("Employee1");
+        GenericStringElements.add("Employee2");
+        GenericStringElements.add("Employee3");
+        GenericStringElements.add("Employee4");
+        GenericStringElements.add("Employee5");
+        NonGenericElements = new ArrayListClass(5);
+        NonGenericElements.add(55);
+        NonGenericElements.add(55.586);
+        NonGenericElements.add(55923797);
+        NonGenericElements.add("55");
+        NonGenericElements.add('a');
+    }
+
+    @Test
+    public void get_test_expected_58() {
+        GenericElements.add(56);
+        GenericElements.add(58);
+        int actual_value = GenericElements.get(6);
+        assertEquals(58,actual_value);
+    }
+    @Test
+    public void get_test_expected_Employee5() {
+        GenericStringElements.add("Employee6");
+        String actual_value = GenericStringElements .get(4);
+        assertEquals("Employee5",actual_value);
+    }
+    @Test
+    public void get_test_expected_55() {
+        NonGenericElements.add(true);
+        Object actual_value = NonGenericElements.get(3);
+        assertEquals("55",actual_value);
+    }
+    @Test
+    public void remove_test_expected56() {
+        GenericElements.add(56);
+        GenericElements.add(58);
+        int actual_value = GenericElements.remove(5);
+        assertEquals(56,actual_value);
+    }
+    @Test
+    public void remove_test_expected_false() {
+        NonGenericElements.add(false);
+        Object actual_value = NonGenericElements.remove(5);
+        assertEquals(false,actual_value);
+    }
+    @Test
+    public void remove_test_expected_Employee67() {
+        GenericStringElements.add("Employee6");
+        String actual_value = GenericStringElements.remove(5);
+        assertNotEquals("Employee67",actual_value);
+    }
+
+    @Test
+    public void indexOf_test_expected_5() {
+        GenericElements.add(56);
+        GenericElements.add(58);
+        int actual_value = GenericElements.indexOf(56);
+        assertEquals(5,actual_value);
+    }
+    @Test
+    public void indexOf_test_expected_negativevalue() {
+        GenericStringElements.add("Employee6");
+        GenericStringElements.add("Employee7");
+        int actual_value = GenericStringElements.indexOf("Employee8");
+        assertEquals(-1,actual_value);
+    }
+    @Test
+    public void indexOf_test_expected_3() {
+        NonGenericElements.add(56);
+        NonGenericElements.add(58);
+        int actual_value = NonGenericElements.indexOf("55");
+        assertEquals(3,actual_value);
+    }
+    @Test
+    public void clear_test_expected_0() {
+        GenericElements.add(56);
+        GenericElements.add(58);
+        GenericElements.clear();
+        int actual_value = GenericElements.ArraySize();
+        assertEquals(0,actual_value);
+    }
+    @Test
+    public void clear_test_expected_Zero() {
+        GenericStringElements.add("Employee7");
+        GenericStringElements.add("Employee6");
+        GenericStringElements.clear();
+        int actual_value = GenericStringElements.ArraySize();
+        assertEquals(0,actual_value);
+    }
+    @Test
+    public void clear_test_expected_zero() {
+        NonGenericElements.add(56);
+        NonGenericElements.clear();
+        int actual_value = NonGenericElements.ArraySize();
+        assertEquals(0,actual_value);
+    }
+    @Test
+    public void ArraySize_test_expected_7() {
+        GenericElements.add(56);
+        GenericElements.add(58);
+        int actual_value = GenericElements.ArraySize();
+        assertEquals(7,actual_value);
+    }
+    @Test
+    public void contains_test_expected_true() {
+        boolean actual_value = GenericElements.contains(55);
+        assertEquals(true,actual_value);
+    }
+
+    @Test
+    public void ArraySize_test_expected_6() {
+        GenericStringElements.add("Employee6");
+        int actual_value = GenericStringElements.ArraySize();
+        assertEquals(6,actual_value);
+    }
+    @Test
+    public void contains_test_expected_false() {
+        boolean actual_value = GenericStringElements.contains("Employee8");
+        assertEquals(false,actual_value);
+    }
+    @Test
+    public void ArraySize_test_expected_5() {
+        int actual_value = NonGenericElements.ArraySize();
+        assertEquals(5,actual_value);
+    }
+    @Test
+    public void contains_test_expectedTrue() {
+        boolean actual_value = NonGenericElements.contains(55);
+        assertEquals(true,actual_value);
+    }
+}
