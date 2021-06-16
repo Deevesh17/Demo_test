@@ -1,6 +1,6 @@
 package com.example.javalist;
 public class HasmapClass<K,V> implements MapFunctions<K,V> {
-    class KeyValuePair<K,V>{
+    private class KeyValuePair<K,V>{
         int hash_value ;
         K key;
         V value;
@@ -38,19 +38,32 @@ public class HasmapClass<K,V> implements MapFunctions<K,V> {
         this.default_sizee = size;
     }
     public int hash(Object key){
-        int h = key.hashCode();
-        return (h) ^ (h >>> default_sizee);
+        String keyToString = String.valueOf(key);
+        int sumOfAscii = 0;
+        for(int idx = 0;idx<keyToString.length();idx++)
+        {
+//            System.out.println(keyToString.charAt(idx));
+            sumOfAscii += keyToString.charAt(idx);
+        }
+//        System.out.println(sumOfAscii);
+        return sumOfAscii;
+    }
+    public int IndexOf(K key,int hash_value){
+        int idx = 0;
+        int index = hash_value % (default_sizee);
+        return index;
     }
     public void updateValue(K key,V value) {
         int hash_value = hash(key);
-        int index = hash_value & (default_sizee - 1);
-        if(key == pairElement[index].key){
+        int index = IndexOf(key,hash_value);
+
+    if(key.equals(pairElement[index].key)){
             pairElement[index].value = value;
         }
         else{
             for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
                 if(sameIndexArray != null){
-                    if(sameIndexArray.key == key){
+                    if(key.equals(sameIndexArray.key)){
                         sameIndexArray.value = value;
                         break;
                     }
@@ -58,18 +71,22 @@ public class HasmapClass<K,V> implements MapFunctions<K,V> {
             }
         }
     }
-        public boolean ifExist(K key){
+    public boolean ifExist(K key){
         boolean existststus = false;
-        int hash_value = hash(key);
-        int index = hash_value & (default_sizee - 1);
-        if(key == pairElement[index].key){
-            existststus = true;
-        }
-        else{
-            for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
-                if(sameIndexArray != null){
-                    if(sameIndexArray.key == key){
-                        existststus =  true;
+        int hashValue = hash(key);
+        int index = hashValue % (default_sizee);
+        if(pairElement[index] != null) {
+            if (key.equals(pairElement[index].key)) {
+//                System.out.println("if");
+                existststus = true;
+            } else {
+//                System.out.println("else");
+                for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
+//                    System.out.println(sameIndexArray);
+                    if (sameIndexArray != null) {
+                        if (key.equals(sameIndexArray.key) ) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -79,13 +96,16 @@ public class HasmapClass<K,V> implements MapFunctions<K,V> {
     public void put(K key,V value) {
         int hash_value = hash(key);
         keyobject = new KeyValuePair<K,V>(hash_value,key,value);
-        int index = hash_value & (default_sizee - 1);
+        int index = IndexOf(key,hash_value);
+//        System.out.println("put"+index);
         if(pairElement[index] != null)
         {
             if(ifExist(key)){
+//                System.out.println("puttif");
                 updateValue(key,value);
             }
             else{
+//                System.out.println("puttelse");
                 pairElement[index].SameIndexKeyArray(keyobject);
                 size++;
             }
@@ -106,6 +126,7 @@ public class HasmapClass<K,V> implements MapFunctions<K,V> {
         for(int index = 0 ;index < actualArray.length;index++) {
             NewSizeArrayElement[index] = actualArray[index];
         }
+        this.default_sizee = size;
         return NewSizeArrayElement;
     }
     public void print(){
@@ -132,20 +153,66 @@ public class HasmapClass<K,V> implements MapFunctions<K,V> {
     }
     public V get(K key) throws NullPointerException{
         int hashValue = hash(key);
-        int index = hashValue & (default_sizee - 1);
-        V Value = null;
-        if(pairElement[index].hash_value == hashValue && pairElement[index].key == key){
-            return (V) pairElement[index].value;
-        }
-        else {
-            for(KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys){
-                if(sameIndexArray.hash_value == hashValue && sameIndexArray.key == key){
-                    Value =  (V) (sameIndexArray.value);
-                    break;
+        int index = IndexOf(key,hashValue);
+        if(pairElement[index] != null ) {
+            if (pairElement[index].hash_value == hashValue && key.equals(pairElement[index].key)) {
+                return (V) pairElement[index].value;
+            } else {
+                for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
+                    if(sameIndexArray != null) {
+                        if (sameIndexArray.hash_value == hashValue && key.equals(sameIndexArray.key)) {
+                            return (V) (sameIndexArray.value);
+                        }
+                    }
                 }
             }
         }
-        return  Value;
+        return  null;
+    }
+    public Object[] getKey(){
+        Object[] keyArray = getKeyValue("key");
+        return keyArray;
+    }
+    public Object[] getValue(){
+        Object[] valueArray = getKeyValue("value");
+        return valueArray;
+    }
+    public Object[] getKeyValue(Object status){
+        Object[] keyValueArray = new Object[this.size];
+        int sizeindex = 0;
+        for (int index = 0 ;index < pairElement.length;index++){
+            if (pairElement[index] != null) {
+                if (pairElement[index].Same_index_Keys.length == 0) {
+                    if(status == "key"){
+                        keyValueArray[sizeindex] = pairElement[index].key ;
+                    }
+                    else {
+                        keyValueArray[sizeindex] = pairElement[index].value ;
+                    }
+                    sizeindex++;
+                } else {
+                    if(status == "key"){
+                        keyValueArray[sizeindex] = pairElement[index].key ;
+                    }
+                    else {
+                        keyValueArray[sizeindex] = pairElement[index].value ;
+                    }
+                    sizeindex++;
+                    for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
+                        if(sameIndexArray != null){
+                            if(status == "key"){
+                                keyValueArray[sizeindex] = sameIndexArray.key ;
+                            }
+                            else {
+                                keyValueArray[sizeindex] = sameIndexArray.value ;
+                            }
+                            sizeindex++;
+                        }
+                    }
+                }
+            }
+        }
+        return keyValueArray;
     }
 
 }
