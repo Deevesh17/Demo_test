@@ -1,0 +1,14 @@
+package ContactApp;
+
+import Collections.*;
+public interface ContactMethods {
+	public void addNewContact(String firstName,String lastName,String dateOfBirth,String group,
+            StringBuffer Notes,Long primaryMobileNo,Arraylist<Long> AdditionalMobileNo,Hashmap<String,String> SocialNetworks );
+	public void updateFullNameAndLastname(Contact contact,String firstName, String lastname,String dob, String group);
+	public void updateSocialNetwork(Contact contact,String domain, String domainLink );
+	public void updateAdditionalMobileNumber(Contact contact,Long Number );
+	public void updateNotes(Contact contact,String notes );
+	public Long removeExistingContact(Contact contact);
+	public void viewContact(Contact contact);
+	public boolean ifExists(Contact contact,Long MobileNumber);
+}
