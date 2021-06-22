@@ -1,0 +1,38 @@
+package com.example.kotlin
+
+import java.lang.NumberFormatException
+import java.util.*
+
+class Student(Roll_number : String,Name : String) {
+    var Roll_number: String = Roll_number
+    var Name: String = Name
+    fun printDetails(){
+        println(this.Name + " " + this.Roll_number)
+    }
+}
+
+fun main(){
+    val userInput = Scanner(System.`in`)
+    var count = 0;
+    while(true){
+        println("Enter the values")
+        try {
+            var element: Int = Integer.valueOf(readLine())
+            var scannerinput: Int = userInput.nextInt();
+            var Longelement: Long = userInput.nextLong();
+            println(element + scannerinput + Longelement)
+            count++;
+        }catch (e:NumberFormatException){
+            println("Invalid Input Number Format Exception")
+        }catch (e:InputMismatchException){
+            println("Invalid Input Input Mismatch Exception")
+            userInput.nextLine()
+        }
+        if(count == 3){
+            break;
+        }
+    }
+    var StudentObject = Student("18cs1","Harish")
+    StudentObject.printDetails()
+
+}

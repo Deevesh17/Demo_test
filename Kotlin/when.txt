@@ -1,0 +1,27 @@
+package com.example.kotlin
+
+import java.util.*
+
+class Student(Roll_number : String,Name : String) {
+    var Roll_number: String = Roll_number
+    var Name: String = Name
+    fun printDetails(valuetype : Any){
+        println(this.Name + " " + this.Roll_number)
+        when(valuetype){
+            "Name" -> println(Name)
+            "Roll_number" -> println(Roll_number)
+            !is String -> println("Invalid Parameter Value")
+            else -> println("this is not available case ")
+        }
+    }
+}
+
+fun main(){
+
+    var StudentObject = Student("18cs1","Harish")
+    StudentObject.printDetails("Name")
+    StudentObject.printDetails("Roll_number")
+    StudentObject.printDetails("Hello")
+    StudentObject.printDetails(5)
+
+}

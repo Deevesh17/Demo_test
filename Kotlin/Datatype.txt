@@ -1,0 +1,21 @@
+package com.example.kotlin
+
+import java.util.*
+
+
+fun additionOfTwoNumber(a : Int, b :Int) :Int{
+ return a + b
+}
+//DataTypes
+fun main() {
+ var intelement: Int = 52
+ var longelement: Long = 52
+ var stringelement: String = "52"
+ var floatelement: Double = 52.55
+ var Charelement: Char = 'h'
+ val element: Any = "hello"
+// element = 85
+ println("IntElement : $intelement \nLongElement : $longelement \nStringElement : $stringelement \nFloatElement : $floatelement \nCharElement : $Charelement")
+ println(additionOfTwoNumber(50, 80))
+}
+
