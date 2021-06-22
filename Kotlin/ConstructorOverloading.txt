@@ -1,0 +1,16 @@
+package com.example.kotlin
+
+class ContsructorOverLoading ()
+{
+    constructor(element : String) :this(){
+        println("In single Parameter Constructor")
+    }
+    constructor(element: String,elementInt: Int) : this(){
+        println("In two Parameter Constructor")
+    }
+}
+
+fun main(){
+    var singleConstructor = ContsructorOverLoading("hello")
+    var twoConstructor = ContsructorOverLoading("hello", 5)
+}

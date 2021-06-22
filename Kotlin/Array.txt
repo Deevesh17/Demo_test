@@ -1,0 +1,19 @@
+package com.example.kotlin
+
+import java.util.*
+
+fun main() {
+    var userInput = Scanner(System.`in`)
+    println("Enter The Array size : ")
+    var size = Integer.valueOf(readLine())
+    var ArrayElement = Array<Int>(size){0};
+    println("Enter the Array elemnet : ")
+    for(index in (0..size-1) ){
+        ArrayElement[index] = userInput.nextInt()
+    }
+    ArrayElement.reverse()
+    println("Array Elements are...")
+    for (Element in ArrayElement){
+        print("$Element \t")
+    }
+}

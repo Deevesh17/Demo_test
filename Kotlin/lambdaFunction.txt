@@ -1,0 +1,16 @@
+package com.example.kotlin
+//higher-Order-functions
+fun Sumofsquare(element1 : Int,element2 : Int,square : (Int) -> Int){
+    println(square(element1) + square(element2))
+}
+fun square(element : Int ) : Int{
+    return element * element
+}
+fun main() {
+    println("Enter The Element Value:")
+    var sumElement1 : Int = Integer.valueOf(readLine())
+    var sumElement2 : Int = Integer.valueOf(readLine())
+    Sumofsquare(sumElement1,sumElement2,::square)
+    val lambdafunc: (Int,Int) -> Int = { Element1: Int , Element2: Int -> Element1 + Element2 }
+    println(lambdafunc(Integer.valueOf(readLine()), Integer.valueOf(readLine())))
+}
