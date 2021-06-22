@@ -1,7 +1,5 @@
 package Collections;
 
-import androidx.annotation.NonNull;
-
 public  class Hashmap<K,V> implements mapInterface<K,V> {
     private class KeyValuePair<K,V>{
         int hash_value ;
@@ -40,25 +38,30 @@ public  class Hashmap<K,V> implements mapInterface<K,V> {
         this.pairElement = new KeyValuePair[size];
         this.default_sizee = size;
     }
-    @NonNull
     @Override
     public String toString() {
-        String HashString = "{\n";
+        String HashString = "";
         for (int index = 0 ;index < pairElement.length;index++){
             if (pairElement[index] != null) {
                 if (pairElement[index].Same_index_Keys.length == 0) {
-                    HashString += pairElement[index].key + " : " + pairElement[index].value + "\n";
+                    if(pairElement[index].key != null && pairElement[index].value != null) {
+                        HashString += pairElement[index].key + " : " + pairElement[index].value + "\n";
+                    }
                 } else {
-                    HashString += pairElement[index].key + " : " + pairElement[index].value + "\n";
+                    if(pairElement[index].key != null && pairElement[index].value != null) {
+                        HashString += pairElement[index].key + " : " + pairElement[index].value + "\n";
+                    }
                     for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
                         if(sameIndexArray != null){
-                            HashString += sameIndexArray.key + " : " + sameIndexArray.value + "\n";
+                            if(sameIndexArray.key != null && sameIndexArray.value != null) {
+                                HashString += sameIndexArray.key + " : " + sameIndexArray.value + "\n";
+                            }
                         }
                     }
                 }
             }
         }
-        return HashString +="}";
+        return HashString;
     }
     public int hash(Object key){
         String keyToString = String.valueOf(key);
@@ -140,7 +143,7 @@ public  class Hashmap<K,V> implements mapInterface<K,V> {
         }
     }
     public int Mapsize(){
-            return this.size;
+        return this.size;
     }
     public void clearArrayValue(){
         for (int index = 0 ;index < pairElement.length;index++){
@@ -166,44 +169,50 @@ public  class Hashmap<K,V> implements mapInterface<K,V> {
         }
         return  null;
     }
-    public Object[] getKey(){
+    public K[] getKey(){
         Object[] keyArray = getKeyValue("key");
-        return keyArray;
+        return (K[]) keyArray;
     }
-    public Object[] getValue(){
+    public V[] getValue(){
         Object[] valueArray = getKeyValue("value");
-        return valueArray;
+        return (V[]) valueArray;
     }
     public Object[] getKeyValue(Object status){
-        Object[] keyValueArray = new Object[this.size];
+        Object[] keyValueArray = new Object[size];
         int sizeindex = 0;
-        for (int index = 0 ;index < pairElement.length;index++){
+        for (int index = 0 ;index < pairElement.length - 1;index++){
             if (pairElement[index] != null) {
                 if (pairElement[index].Same_index_Keys.length == 0) {
-                    if(status == "key"){
-                        keyValueArray[sizeindex] = pairElement[index].key ;
+                    if(pairElement[index].key != null && pairElement[index].value != null) {
+                        if(status.equals("key")){
+                            keyValueArray[sizeindex] = pairElement[index].key ;
+                        }
+                        else {
+                            keyValueArray[sizeindex] = pairElement[index].value ;
+                        }
+                        sizeindex++;
                     }
-                    else {
-                        keyValueArray[sizeindex] = pairElement[index].value ;
-                    }
-                    sizeindex++;
                 } else {
-                    if(status == "key"){
-                        keyValueArray[sizeindex] = pairElement[index].key ;
+                    if(pairElement[index].key != null && pairElement[index].value != null) {
+                        if(status == "key"){
+                            keyValueArray[sizeindex] = pairElement[index].key ;
+                        }
+                        else {
+                            keyValueArray[sizeindex] = pairElement[index].value ;
+                        }
+                        sizeindex++;
                     }
-                    else {
-                        keyValueArray[sizeindex] = pairElement[index].value ;
-                    }
-                    sizeindex++;
                     for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
                         if(sameIndexArray != null){
-                            if(status == "key"){
-                                keyValueArray[sizeindex] = sameIndexArray.key ;
+                            if(sameIndexArray.key != null && sameIndexArray.value != null) {
+                                if(status == "key"){
+                                    keyValueArray[sizeindex] = sameIndexArray.key ;
+                                }
+                                else {
+                                    keyValueArray[sizeindex] = sameIndexArray.value ;
+                                }
+                                sizeindex++;
                             }
-                            else {
-                                keyValueArray[sizeindex] = sameIndexArray.value ;
-                            }
-                            sizeindex++;
                         }
                     }
                 }
@@ -211,5 +220,27 @@ public  class Hashmap<K,V> implements mapInterface<K,V> {
         }
         return keyValueArray;
     }
+    public void remove(K key) {
+        int hashValue = hash(key);
+        int index = hashValue % (default_sizee);
+        if(pairElement[index] != null && ifExist(key)) {
+            if (key.equals(pairElement[index].key)) {
+                pairElement[index].key = null;
+                pairElement[index].value = null;
+                size--;
+            } else {
+                for (KeyValuePair sameIndexArray : pairElement[index].Same_index_Keys) {
+                    if (sameIndexArray != null) {
+                        if (key.equals(sameIndexArray.key) ) {
+                            sameIndexArray.key = null;
+                            sameIndexArray.value = null;
+                            size--;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
+    }
 }

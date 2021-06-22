@@ -1,16 +1,38 @@
-package com.example.javalist;
+package Collections;
 
 
-public class ArrayListClass<E> implements CommonFunctions<E>{
+import androidx.annotation.NonNull;
+
+import org.jetbrains.annotations.NotNull;
+
+public class Arraylist<E> implements listInterface<E> {
     private Object[] ArrayElement = {};
 
     private int defaultSize = 10;
     private int size = 0;
 
-    public ArrayListClass() {
+    public Arraylist() {
         this.ArrayElement = new Object[defaultSize];
     }
-    public ArrayListClass(int size) {
+
+    @NonNull
+    @NotNull
+    @Override
+    public String toString() {
+        String ToArrayString = "[ ";
+        for (int i = 0;i < size;i++) {
+            if(i != size-1 ){
+                ToArrayString += ArrayElement[i] + ", ";
+            }
+            else
+            {
+                ToArrayString += ArrayElement[i];
+            }
+        }
+        return ToArrayString + " ]";
+    }
+
+    public Arraylist(int size) {
         this.ArrayElement = new Object[size];
         this.defaultSize = size;
     }
@@ -66,7 +88,7 @@ public class ArrayListClass<E> implements CommonFunctions<E>{
     }
     public boolean contains(E e) {
         for(int i = 0; i < size;i++) {
-            if(ArrayElement[i] == e) {
+            if(ArrayElement[i].equals(e)) {
                 return true;
             }
         }
