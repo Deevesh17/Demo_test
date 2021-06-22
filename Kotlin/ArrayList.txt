@@ -1,0 +1,29 @@
+package com.example.kotlin
+
+import Collections.Arraylist
+import java.util.ArrayList
+
+fun main() {
+    var ArrayElement = Arraylist<Int>();
+    ArrayElement.add(45);
+    ArrayElement.add(46);
+    ArrayElement.add(47);
+    ArrayElement.add(48);
+    ArrayElement.add(49);
+    ArrayElement.add(50);
+    ArrayElement.add(51);
+    ArrayElement.add(52);
+    println(ArrayElement.ArraySize())
+    println("Get function ${ArrayElement.get(5)}")
+    ArrayElement.remove(5)
+    println(ArrayElement.ArraySize())
+
+//    ArrayElement.set(5,6562)
+    println(ArrayElement)
+    var index : Int = 0;
+    while(index < ArrayElement.ArraySize()){
+        println(ArrayElement.get(index))
+        index++
+    }
+
+}

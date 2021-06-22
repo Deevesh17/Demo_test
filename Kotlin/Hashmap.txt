@@ -1,0 +1,19 @@
+package com.example.kotlin
+
+import Collections.Hashmap
+
+fun main() {
+    var MapElement = Hashmap<String,String>()
+    MapElement.put("employe1","harish")
+    MapElement.put("employe2","kumar")
+    MapElement.put("employe3","hari")
+    MapElement.put("employe4","kannan")
+    MapElement.put("employe5","hello")
+    MapElement.put("employe6","haashan")
+    MapElement.put("employe5","Deevesh")
+    println(MapElement)
+    var element = MapElement.getKeyValue("key")
+    for(key in element){
+        println("$key  ${MapElement.get(key.toString())}")
+    }
+}
