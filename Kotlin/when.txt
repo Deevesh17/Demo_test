@@ -1,10 +1,16 @@
 package com.example.kotlin
 
+import java.lang.NumberFormatException
 import java.util.*
 
-class Student(Roll_number : String,Name : String) {
-    var Roll_number: String = Roll_number
-    var Name: String = Name
+class Student() {
+    var Roll_number:String = ""
+    var Name:String = ""
+    constructor(Roll_number : String,Name : String) : this() {
+        this.Roll_number = Roll_number
+        this.Name = Name
+    }
+
     fun printDetails(valuetype : Any){
         println(this.Name + " " + this.Roll_number)
         when(valuetype){
