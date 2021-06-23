@@ -1,0 +1,535 @@
+package ContactApp;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.security.PublicKey;
+import java.util.InputMismatchException;
+import java.util.Iterator;
+import java.util.Scanner;
+
+import Collections.*;
+
+public class Contact implements ContactMethods {
+    private String firstName,lastName,dateOfBirth,group, primaryMobileNo;
+    StringBuffer Notes;
+    private Arraylist<String> AdditionalMobileNo = new Arraylist<String>();
+    private Hashmap<String,String> SocialNetworks = new Hashmap<String, String>();
+    public Hashmap<String,String> importfield = new Hashmap<String, String>();
+    public void addNewContact(String firstName,String lastName,String dateOfBirth,String group,
+                              StringBuffer Notes,String primaryMobileNo,Arraylist<String> AdditionalMobileNo,Hashmap<String,String> SocialNetworks ) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.group = group;
+        if(Notes != null) {
+        	this.Notes = Notes;
+        }
+        this.primaryMobileNo = primaryMobileNo;
+        this.AdditionalMobileNo = AdditionalMobileNo;
+        if(SocialNetworks != null) {
+        	this.SocialNetworks = SocialNetworks;
+        }
+    }
+    public void importFunction(Hashmap<String, String> importData) {
+    	this.importfield = importData;
+    }
+    public void updateFullNameAndLastname(Contact contact,String firstName, String lastname,String dob, String group) {
+    	if(firstName != null) {
+    		contact.firstName = firstName;
+    	}
+    	if(lastname != null) {
+    		contact.lastName = lastname;
+    	}
+    	if(dob != null) {
+    		contact.dateOfBirth = dob;
+    	}
+    	if(group != null) {
+    		    		
+    	}
+    }
+    public void updateSocialNetwork(Contact contact,String domain, String domainLink ) {
+    	contact.SocialNetworks.put(domain, domainLink);
+    }
+    public void updateAdditionalMobileNumber(Contact contact,String Number ) {
+    	contact.AdditionalMobileNo.add(Number);
+    }
+    public void updateNotes(Contact contact,String notes ) {
+    	contact.Notes.append(notes);
+    }
+    public String removeExistingContact(Contact contact) {
+    	return contact.primaryMobileNo;
+    }
+    public void viewContact(Contact contact){ 
+    	System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    	if(contact.firstName != null) {
+    		System.out.println("Full Name : " + contact.firstName + " " + contact.lastName);
+    	}
+    	if(contact.primaryMobileNo != null) {
+    		System.out.println("Primary Mobile Number : " + contact.primaryMobileNo);
+    	}
+    	if(contact.AdditionalMobileNo.ArraySize() != 0) {
+    		System.out.println("Alternative Mobile Number : ");
+    		for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
+    			System.out.println(contact.AdditionalMobileNo.get(index));
+    		}
+    	}
+    	if(contact.dateOfBirth != null) {
+    		System.out.println("Date Of Birth : " + contact.dateOfBirth);
+    	}
+    	if(contact.group != null) {
+    		System.out.println("Group : " + contact.group);
+    	}
+    	if(contact.SocialNetworks.Mapsize() != 0) {
+    		System.out.println("Social Networks Domain and Link : \n" + contact.SocialNetworks);
+    	}
+    	if(contact.Notes != null) {
+    		System.out.println("Additional Notes : " + contact.Notes);
+    	}
+    	if(contact.importfield != null) {
+    		System.out.println(contact.importfield);
+    	}
+    }
+    public boolean ifExists(Contact contact,String MobileNumber){
+    	if(contact.AdditionalMobileNo.contains(MobileNumber)){
+            return true;
+        }	
+        return false;        
+    }
+    public static void ExportContact(Hashmap<String, Contact> ContactList) {
+    	String Headder = "FullName DateOfBirth PrimaryNumber AdditionalNumber Group Notes SocialMedia";
+    	File Contactfile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\ContactBook.csv");
+		try {
+			String additionalNumber = "",sociaMedia = "";
+				FileWriter ContactBook = new FileWriter(Contactfile);
+				ContactBook.append(Headder);
+				for(Object contactObject : ContactList.getValue()) {
+		    		Contact contact= (Contact) contactObject;
+		    		if(contactObject != null) {
+		    			ContactBook.append("\n");
+		    			ContactBook.append(contact.firstName + contact.lastName + " ");
+		    			ContactBook.append(contact.dateOfBirth + " ");
+		    			ContactBook.append(contact.primaryMobileNo + " ");
+		    			for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
+		    	        	additionalNumber += contact.AdditionalMobileNo.get(index) ;
+		    	        	if(index != contact.AdditionalMobileNo.ArraySize() - 1) {
+		    	        		additionalNumber+=",";
+		    	        	}
+		    	        }
+		    			ContactBook.append(additionalNumber + " ");
+		    			ContactBook.append(contact.group + " ");
+		    			ContactBook.append(contact.Notes + " ");
+		    			for(Object key : contact.SocialNetworks.getKey()) {
+		    				String keyString = (String) key;
+		    				sociaMedia += keyString +":"+contact.SocialNetworks.get(keyString)+",";
+		    			}
+		    			ContactBook.append(sociaMedia);
+		    		}
+				}
+				ContactBook.flush();
+				ContactBook.close();
+		   
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+}
+class ContactApplication {
+    public static String ifExist(Hashmap<String, Contact> ContactList,String MobileNumber,String status) {
+    	for(Object contactObject : ContactList.getValue()) {
+    		Contact contact= (Contact) contactObject;
+    		if(contactObject != null) {
+	    		if(contact.ifExists(contact, MobileNumber)) {
+	    			if(status == "search") {
+	    				return "yes";
+	    			}
+	    			else if(status == "remove") {
+	    				return contact.removeExistingContact(contact);
+	    			}
+	    		}
+    		}
+    	}
+        return "no";
+    }
+    
+//    public static boolean validateMobileNumber(Long MobileNumber) {
+//    	String Mobilenumber = String.valueOf(MobileNumber);
+//    	if(Mobilenumber.length() > 10 || Mobilenumber.length() < 10) {
+//    		return false;
+//    	}
+//    	else {
+//    		if(Mobilenumber.charAt(0) != '6' && Mobilenumber.charAt(0) != '7' && Mobilenumber.charAt(0) != '8' && Mobilenumber.charAt(0) != '9' ) {
+//    			return false;
+//    		}
+//    	}
+//		return true;    	   	
+//    }
+    
+    public static void main(String[] args) {
+        Scanner userInput = new Scanner(System.in);
+        Hashmap<String, Contact> Contactlist = new Hashmap<String,Contact>(); 
+        int choice = 0;
+        String primaryMobileNo = null;
+        String firstName = null,lastName = null,dateOfBirth = null,group = null;
+        StringBuffer notes = null ;
+        Arraylist<String> AdditionalMobileNo = null;
+        Hashmap<String,String> SocialNetworks = null;
+        Contact createContact;
+        System.out.println("Hi, There you can add ,delete and update your contact here!!");
+        while(true){
+            System.out.println("~~~~~~~~~~~~~~~~~~~\n1.Create Contact. \n2.Display the contact list. \n3.Remove The Contact from List.\n4.Update The Contact.\n5.Search Contact from List\n6.Export The contact\n7.Import The Contact\n8.Exit...\n~~~~~~~~~~~~~~~~~~~");
+            try {
+                choice = userInput.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid Input.");
+                userInput.nextLine();
+            }
+            if(choice == 1) {
+            	try {
+	            	userInput.nextLine();
+	                System.out.println("Enter the Person First Name and Last Name:");
+	                firstName = userInput.nextLine();
+	                lastName = userInput.nextLine();
+	                System.out.println("Enter the Person Date Of Birth(DD-MM-YY) : ");
+	                dateOfBirth = userInput.nextLine();
+	                System.out.println("Enter the Person Primary Mobile Number");
+	                primaryMobileNo = userInput.nextLine();
+//	               	while(true) {
+//	               		primaryMobileNo = userInput.nextLine();
+////	               		if(validateMobileNumber(primaryMobileNo)) {
+////	               			break;
+////	               		}
+//	               		else {
+//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
+//	               		}
+//	               	}	                
+	               	
+	               	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals("yes") )
+	               	{
+	               		System.err.println("Mobile Number Already Exists You can Update by clicking 4");
+	               	}
+	               	else {
+	               		AdditionalMobileNo = new Arraylist<String>();
+		                while (choice == 1) {
+		                    System.out.println("If You Need to add Alternative mobile number just press 1 else press 0");
+		                    choice = userInput.nextInt();
+		                    userInput.nextLine();
+		                    String additionalMobileNumber;
+		                    if (choice == 1) {
+		                        System.out.println("Enter the Person Mobile Number :");
+		                        additionalMobileNumber = userInput.nextLine();
+//		                        while(true) {
+//		                        	
+//		    	               		if(validateMobileNumber(additionalMobileNumber)) {
+//		    	               			break;
+//		    	               		}
+//		    	               		else {
+//		    	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
+//		    	               		}
+//		    	               	}
+		                        if(AdditionalMobileNo.contains(additionalMobileNumber) || ifExist(Contactlist, additionalMobileNumber,"search").equals(1L) || primaryMobileNo.equals(additionalMobileNumber) || Contactlist.ifExist(additionalMobileNumber) )
+		                        {
+		                        	System.err.println("Mobile Number Already Exists");
+		                        }
+		                        else {
+		                        	AdditionalMobileNo.add(additionalMobileNumber);
+		                        }
+		                    } else {
+		                        choice = 0;
+		                    }
+		                }
+		                System.out.println("If You Need to add Social Medias links just press 1 else press 0");
+		                choice = userInput.nextInt();
+		                if (choice == 1) {
+		                	SocialNetworks = new Hashmap<String, String>();
+		                    while (choice == 1) {
+		                        if (choice == 1) {
+		                            String domain, domainLink;
+		                            userInput.nextLine();
+		                            System.out.println("Enter the Person Social Media Domain :");
+		                            domain = userInput.nextLine();
+		                            System.out.println("Enter the Person Social Media Domain Link :");
+		                            domainLink = userInput.nextLine();
+		                            SocialNetworks.put(domain, domainLink);
+		                        } else {
+		                            choice = 0;
+		                        }
+		                        System.out.println(" press 1 to add or press 0 to skip");
+		                        choice = userInput.nextInt();
+		                    }
+		                }
+		                System.out.println("If You Need to add Any Notes for Remainder just press 1 else press 0");
+		                choice = userInput.nextInt();
+		                if (choice == 1) {
+		                	notes = new StringBuffer();
+		                    while (choice == 1) {	
+		                        if (choice == 1) {
+		                            System.out.println("Enter the Notes :");
+		                            userInput.nextLine();
+		                            notes.append(userInput.nextLine());
+		                        } else {
+		                            choice = 0;
+		                        }
+		                        System.out.println(" press 1 to add or press 0 to skip");
+		                        choice = userInput.nextInt();
+		                    }
+		                }
+		                System.out.println("Enter Group like Colleague/Friend/Family");
+		                group = userInput.next();
+		                createContact = new Contact();
+		                createContact.addNewContact(firstName, lastName, dateOfBirth, group, notes, primaryMobileNo, AdditionalMobileNo, SocialNetworks);
+		                Contactlist.put(primaryMobileNo, createContact);
+		                System.out.println(Contactlist);
+	               	}
+	               }catch (InputMismatchException e) {
+		            	System.out.println("Invalid Input");	
+		            	userInput.nextLine();
+				   }catch (Exception e) {
+							System.out.println("Exception Occured " + e);	
+			            	userInput.nextLine();
+						}
+            }
+            else if( choice == 2){
+            	Object[] MobileNumberKey = Contactlist.getKey();
+            	System.out.println("Contact List ...");
+                for (Object Number : MobileNumberKey){
+                	System.out.println(Number);
+                    if(Number != null){
+                        Contactlist.get((String) Number).viewContact(Contactlist.get((String) Number));
+                    }
+                }
+            }
+            else if(choice == 3) {
+            	System.out.println("Please Enter the Person Mobile Number");
+            	try {
+            		userInput.nextLine();
+            		primaryMobileNo = userInput.nextLine();
+//            		while(true) {
+//	               		primaryMobileNo = userInput.nextLong();
+//	               		if(validateMobileNumber(primaryMobileNo)) {
+//	               			break;
+//	               		}
+//	               		else {
+//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
+//	               		}
+//	               	}
+	            	if(Contactlist.ifExist(primaryMobileNo)) {
+	            		Contactlist.remove(primaryMobileNo);
+	            	}
+	            	else {
+	            		primaryMobileNo = ifExist(Contactlist, primaryMobileNo,"remove");
+	            		Contactlist.remove(primaryMobileNo);
+	            	}
+            	}catch (InputMismatchException e) {
+	            	System.out.println("Invalid Input");	
+	            	userInput.nextLine();
+				}catch (Exception e) {
+						System.out.println("Exception Occured " + e);	
+		            	userInput.nextLine();
+					}
+            }
+            else if(choice == 4) {
+            	System.out.println("Please Enter the Person Mobile Number");
+            	try {
+            		userInput.nextLine();
+            		primaryMobileNo = userInput.nextLine();
+//            		while(true) {
+//	               		primaryMobileNo = userInput.nextLong();
+//	               		if(validateMobileNumber(primaryMobileNo)) {
+//	               			break;
+//	               		}
+//	               		else {
+//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
+//	               		}
+//	               	}
+	            	Contact contact;
+	            	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals(1L)) {
+	            		if(Contactlist.ifExist(primaryMobileNo)) {
+	            			contact = Contactlist.get(primaryMobileNo);
+	            		}
+	            		else {
+	            			primaryMobileNo = ifExist(Contactlist, primaryMobileNo,"remove");
+	            			contact = Contactlist.get(primaryMobileNo);
+	            		}
+	            		contact.viewContact(contact);
+	            		System.out.println();
+	            		System.out.println("If You Need To update FullName or Date Of Birth or group  press 1 or press 0 to skip");
+	            		choice = userInput.nextInt();
+	        			firstName = null;
+	        			lastName = null;
+	        			dateOfBirth = null;
+	        			group = null;
+	            		if(choice == 1) {
+	            			userInput.nextLine();		
+	            			System.out.println("Enter the Person First Name and Last Name:");
+	                        firstName = userInput.nextLine();
+	                        lastName = userInput.nextLine();
+	            		}
+	                    System.out.println("If You Need To update Person Date Of Birth press 1 or press 0 to skip");
+	                    choice = userInput.nextInt();
+	                    if(choice == 1) {
+	                        System.out.println("Enter the Person Date Of Birth(DD-MM-YY) : ");
+	                        dateOfBirth = userInput.next();
+	                    }
+	                    System.out.println("If You Need To update Group press 1 or press 0 to skip");
+	                    choice = userInput.nextInt();
+	                    if(choice == 1) {
+	                        System.out.println("Enter Group like Colleague/Friend/Family");
+	    	                group = userInput.next();
+	                    }
+	                    contact.updateFullNameAndLastname(contact, firstName,lastName, dateOfBirth, group);
+	            		System.out.println("If You Need To add Social Network press 1 or press 0 to skip");
+	            		choice = userInput.nextInt();
+	                    while (choice == 1) {
+	                        if (choice == 1) {
+	                            String domain, domainLink;
+	                            userInput.nextLine();
+	                            System.out.println("Enter the Person Social Media Domain :");
+	                            domain = userInput.nextLine();
+	                            System.out.println("Enter the Person Social Media Domain Link :");
+	                            domainLink = userInput.nextLine();
+	                            contact.updateSocialNetwork(contact,domain, domainLink);
+	                        } else {
+	                            choice = 0;
+	                        }
+	                        System.out.println(" press 1 to add or press 0 to skip");
+	                        choice = userInput.nextInt();
+	                    }
+	                    System.out.println("If You Need To add Additional Mobile Number press 1 or press 0 to skip");
+	            		choice = userInput.nextInt();
+	                    while (choice == 1) {
+	                        if (choice == 1) {
+	                            userInput.nextLine();
+	                            System.out.println("Enter the Person Mobile Number :");
+	                            primaryMobileNo = userInput.nextLine();
+//	                            while(true) {
+//	                            	primaryMobileNo = userInput.nextLong();
+//		    	               		if(validateMobileNumber(primaryMobileNo)) {
+//		    	               			break;
+//		    	               		}
+//		    	               		else {
+//		    	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
+//		    	               		}
+//		    	               	}
+	                            contact.updateAdditionalMobileNumber(contact, primaryMobileNo);
+	                        } else {
+	                            choice = 0;
+	                        }
+	                        System.out.println(" press 1 to add or press 0 to skip");
+	                        choice = userInput.nextInt();
+	                    }
+	                    System.out.println("If You Need to add Any Notes for Remainder just press 1 else press 0");
+		                choice = userInput.nextInt();
+		                if (choice == 1) {
+		                	notes = new StringBuffer();
+		                    while (choice == 1) {	
+		                        if (choice == 1) {
+		                            System.out.println("Enter the Notes :");
+		                            userInput.nextLine();
+		                            contact.updateNotes(contact, userInput.nextLine());
+		                        } else {
+		                            choice = 0;
+		                        }
+		                        System.out.println(" press 1 to add or press 0 to skip");
+		                        choice = userInput.nextInt();
+		                    }
+		                }
+	                    contact.viewContact(contact);
+	            	}
+	            else {
+	                	System.out.println("The Mobile Number You Entred is not available in your Contact list You can add it by creating the contact...");
+	                }
+	            	}catch (InputMismatchException e) {
+	            	System.out.println("Invalid Input");	
+	            	userInput.nextLine();
+					}catch (Exception e) {
+						System.out.println("Exception Occured " + e);	
+		            	userInput.nextLine();
+					}
+            }
+            else if(choice == 5) {
+            	System.out.println("Please Enter the Person Mobile Number");
+            	try {
+            		userInput.nextLine();
+            		primaryMobileNo = userInput.nextLine();
+//            		while(true) {
+//	               		primaryMobileNo = userInput.nextLong();
+//	               		if(validateMobileNumber(primaryMobileNo)) {
+//	               			break;
+//	               		}
+//	               		else {
+//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
+//	               		}
+//	               	}
+	            	Contact contact;
+	            	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals(1L)) {
+	            		if(Contactlist.ifExist(primaryMobileNo)) {
+	            			contact = Contactlist.get(primaryMobileNo);
+	            		}
+	            		else {
+	            			primaryMobileNo = ifExist(Contactlist, primaryMobileNo,"remove");
+	            			contact = Contactlist.get(primaryMobileNo);
+	            		}
+	            		contact.viewContact(contact);
+	            	}
+	            	else {
+	                	System.out.println("The Mobile Number You Entred is not available in your Contact list You can add it by creating the contact...");
+	                }
+	            	}catch (InputMismatchException e) {
+	            	System.out.println("Invalid Input");	
+	            	userInput.nextLine();
+					}catch (Exception e) {
+						System.out.println("Exception Occured " + e);	
+		            	userInput.nextLine();
+					}
+	            	
+            	
+            }
+            else if(choice == 6) {
+            	Contact.ExportContact(Contactlist);
+            }
+            else if(choice == 7) {
+            	File ContactFile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\format.csv");
+            	int count = 0;
+            	String Header[] = null;
+            	Hashmap<String, String> importFileData = null ;
+            	try {
+            		if(ContactFile.canRead()) {
+            			Scanner fileContent = new Scanner(ContactFile);
+            			while(fileContent.hasNextLine()) {
+            				String[] Filedata = fileContent.nextLine().split(",");
+            				importFileData = new Hashmap<String,String>();
+            				if(count == 0 ) {
+            					Header = Filedata;
+            				}
+            				int index = 0;
+            				for(String Colunmelement : Filedata) {
+            					importFileData.put(Header[index], Colunmelement);
+            					index++;
+            				}
+            				createContact = new Contact();
+            				createContact.importFunction(importFileData);
+            				Contactlist.put(String.valueOf(count), createContact);
+            				count++;
+            				
+            			}
+            			fileContent.close();
+            		}
+            		System.out.println(count);
+            	}
+            	catch (Exception e) {
+            		System.out.println("Exception occured");
+				}
+            }
+            else if(choice == 8) {
+            	System.out.println("Bye...");
+            	break;
+            }
+            	
+        }
+    }
+}
