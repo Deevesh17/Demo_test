@@ -1,0 +1,40 @@
+package com.example.kotlin
+
+
+interface Collagefun {
+    fun printDetails()
+}
+open class StudentDetails(StudentName : String, FatherName : String, dateOfBirth : String, phoneNumber : Long) {
+    var StudentName:String = StudentName
+    var FatherName:String = FatherName
+    var dateOfBirth:String = dateOfBirth
+    var phoneNumber : Long = phoneNumber
+}
+class Collage(
+    Roll_no: String,
+    Deptmn: String,
+    year: String,
+    StudentName: String,
+    FatherName: String,
+    dateOfBirth: String,
+    phoneNumber: Long
+) : StudentDetails(StudentName , FatherName , dateOfBirth , phoneNumber),Collagefun{
+    var Roll_no: String = Roll_no
+    var Deptmn : String = Deptmn
+    var year : String = year
+
+    override fun printDetails(){
+        println("Student Name : $StudentName\nFather Name : $FatherName\nDate of Birth : $dateOfBirth\nPhone Number : $phoneNumber\nRoll Number : $Roll_no\nDepartment : $Deptmn\nYear : $year")
+    }
+
+}
+fun main() {
+    val obj = Collage("18gvjhv10", "cse", "3rd","Deevesh","kumar","24-03-2000",7010071526)
+    obj.printDetails()
+    val element = object : Collagefun {
+        override fun printDetails() {
+            println("overided")
+        }
+    }
+    element.printDetails()
+}
