@@ -1,24 +1,31 @@
 package ContactApp;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.security.PublicKey;
-import java.util.InputMismatchException;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.util.*;
+
+import org.w3c.dom.UserDataHandler;
 
 import Collections.*;
 
+class ContactAddress{
+	String city = null,country = null,address = null,postalCode = null ;
+	public ContactAddress(String city,String country,String address,String postalCode) {
+		this.address = address;
+		this.city = city;
+		this.country = country;
+		this.postalCode = postalCode;
+	}
+}
 public class Contact implements ContactMethods {
-    private String firstName,lastName,dateOfBirth,group, primaryMobileNo;
+    private String firstName,lastName,dateOfBirth,group, primaryMobileNo,email,web;
     StringBuffer Notes;
     private Arraylist<String> AdditionalMobileNo = new Arraylist<String>();
     private Hashmap<String,String> SocialNetworks = new Hashmap<String, String>();
-    public Hashmap<String,String> importfield = new Hashmap<String, String>();
+    public Hashmap<String,String> additionalFields  = new Hashmap<String, String>();
+    ContactAddress addressDetails;
     public void addNewContact(String firstName,String lastName,String dateOfBirth,String group,
-                              StringBuffer Notes,String primaryMobileNo,Arraylist<String> AdditionalMobileNo,Hashmap<String,String> SocialNetworks ) {
+                              StringBuffer Notes,String primaryMobileNo,Arraylist<String> AdditionalMobileNo,Hashmap<String,String> SocialNetworks,String city,String country,String address,String email,String web,String PostalCode,Hashmap<String, String> additionalFields ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -31,9 +38,10 @@ public class Contact implements ContactMethods {
         if(SocialNetworks != null) {
         	this.SocialNetworks = SocialNetworks;
         }
-    }
-    public void importFunction(Hashmap<String, String> importData) {
-    	this.importfield = importData;
+        addressDetails = new ContactAddress(city,country,address,PostalCode);
+        this.email = email;
+        this.web = web;
+        this.additionalFields = additionalFields;
     }
     public void updateFullNameAndLastname(Contact contact,String firstName, String lastname,String dob, String group) {
     	if(firstName != null) {
@@ -46,7 +54,7 @@ public class Contact implements ContactMethods {
     		contact.dateOfBirth = dob;
     	}
     	if(group != null) {
-    		    		
+    		contact.group = group;
     	}
     }
     public void updateSocialNetwork(Contact contact,String domain, String domainLink ) {
@@ -69,26 +77,45 @@ public class Contact implements ContactMethods {
     	if(contact.primaryMobileNo != null) {
     		System.out.println("Primary Mobile Number : " + contact.primaryMobileNo);
     	}
-    	if(contact.AdditionalMobileNo.ArraySize() != 0) {
-    		System.out.println("Alternative Mobile Number : ");
-    		for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
-    			System.out.println(contact.AdditionalMobileNo.get(index));
-    		}
+    	if(contact.AdditionalMobileNo != null) {
+	    	if(contact.AdditionalMobileNo.ArraySize() != 0) {
+	    		System.out.println("Alternative Mobile Number : ");
+	    		for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
+	    			System.out.println(contact.AdditionalMobileNo.get(index));
+	    		}
+	    	}
     	}
-    	if(contact.dateOfBirth != null) {
+	    if(contact.dateOfBirth != null) {
     		System.out.println("Date Of Birth : " + contact.dateOfBirth);
     	}
     	if(contact.group != null) {
     		System.out.println("Group : " + contact.group);
     	}
-    	if(contact.SocialNetworks.Mapsize() != 0) {
-    		System.out.println("Social Networks Domain and Link : \n" + contact.SocialNetworks);
+    	if(contact.SocialNetworks != null) {
+	    	if(contact.SocialNetworks.Mapsize() != 0 ) {
+	    		System.out.println("Social Networks Domain and Link : \n" + contact.SocialNetworks);
+	    	}
     	}
     	if(contact.Notes != null) {
     		System.out.println("Additional Notes : " + contact.Notes);
     	}
-    	if(contact.importfield != null) {
-    		System.out.println(contact.importfield);
+    	if(contact.addressDetails.address != null ) {
+    		System.out.println("Address : " + contact.addressDetails.address);
+    	}
+    	if(contact.addressDetails.city != null) {
+    		System.out.println("City : " + contact.addressDetails.city);
+    	}
+    	if(contact.addressDetails.country != null) {
+    		System.out.println("Country : " + contact.addressDetails.country);
+    	}
+    	if(contact.email != null) {
+    		System.out.println("Email : " + contact.email);
+    	}
+    	if(contact.web != null) {
+    		System.out.println("Web : " + contact.web);
+    	}
+    	if(contact.additionalFields != null) {
+    		System.out.println(contact.additionalFields);
     	}
     }
     public boolean ifExists(Contact contact,String MobileNumber){
@@ -97,34 +124,88 @@ public class Contact implements ContactMethods {
         }	
         return false;        
     }
-    public static void ExportContact(Hashmap<String, Contact> ContactList) {
-    	String Headder = "FullName DateOfBirth PrimaryNumber AdditionalNumber Group Notes SocialMedia";
-    	File Contactfile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\ContactBook.csv");
+    public static void ExportContacts(Hashmap<String, Contact> ContactList) {
+    	String Headder = "FullName DateOfBirth PrimaryNumber AdditionalNumber Group Notes SocialMedia Address City Country PostalCode AdditionalFields";
 		try {
-			String additionalNumber = "",sociaMedia = "";
+			File Contactfile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\ContactBook.csv");
 				FileWriter ContactBook = new FileWriter(Contactfile);
 				ContactBook.append(Headder);
 				for(Object contactObject : ContactList.getValue()) {
 		    		Contact contact= (Contact) contactObject;
+		    		String additionalNumber = "",sociaMedia = "",additionalField = "";
 		    		if(contactObject != null) {
 		    			ContactBook.append("\n");
 		    			ContactBook.append(contact.firstName + contact.lastName + " ");
-		    			ContactBook.append(contact.dateOfBirth + " ");
+		    			if(contact.dateOfBirth != null) {
+		    				ContactBook.append(contact.dateOfBirth + " ");
+		    			}
+		    			else {
+		    				ContactBook.append(" ");
+		    			}
 		    			ContactBook.append(contact.primaryMobileNo + " ");
-		    			for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
-		    	        	additionalNumber += contact.AdditionalMobileNo.get(index) ;
-		    	        	if(index != contact.AdditionalMobileNo.ArraySize() - 1) {
-		    	        		additionalNumber+=",";
-		    	        	}
-		    	        }
+		    			
+		    			if(contact.AdditionalMobileNo != null) {
+			    			for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
+			    	        	additionalNumber += contact.AdditionalMobileNo.get(index) ;
+			    	        	if(index != contact.AdditionalMobileNo.ArraySize() - 1) {
+			    	        		additionalNumber+=",";
+			    	        	}
+			    	        }
+		    			}
 		    			ContactBook.append(additionalNumber + " ");
-		    			ContactBook.append(contact.group + " ");
-		    			ContactBook.append(contact.Notes + " ");
+		    			if(contact.group != null) {
+		    				ContactBook.append(contact.group + " ");
+		    			}
+		    			else {
+		    				ContactBook.append(" ");
+		    			}
+		    			if(contact.Notes != null) {
+		    				ContactBook.append(contact.Notes + " ");
+		    			}
+		    			else {
+		    				ContactBook.append(" ");
+		    			}
 		    			for(Object key : contact.SocialNetworks.getKey()) {
 		    				String keyString = (String) key;
-		    				sociaMedia += keyString +":"+contact.SocialNetworks.get(keyString)+",";
+		    				if(keyString != null) {
+		    					sociaMedia += keyString +":"+contact.SocialNetworks.get(keyString)+",";
+		    				}
 		    			}
-		    			ContactBook.append(sociaMedia);
+		    			ContactBook.append(sociaMedia + " ");
+		    			if(contact.addressDetails.address != null) {
+		    				ContactBook.append(contact.addressDetails.address.replace(" ","") + " ");
+		    			}
+		    			else {
+		    				ContactBook.append(" ");
+		    			}
+		    			if(contact.addressDetails.city != null) {
+		    				ContactBook.append(contact.addressDetails.city.replace(" ","") + " ");
+		    			}
+		    			else {
+		    				ContactBook.append(" ");
+		    			}
+		    			if(contact.addressDetails.country != null) {
+		    				ContactBook.append(contact.addressDetails.country.replace(" ","") + " ");
+		    			}
+		    			else {
+		    				ContactBook.append(" ");
+		    			}
+		    			if(contact.addressDetails.postalCode != null) {
+		    				ContactBook.append(contact.addressDetails.postalCode.replace(" ","") + " ");
+		    			}
+		    			else {
+		    				ContactBook.append(" ");
+		    			}
+		    			if(contact.additionalFields != null){
+			    			Object[] additional = contact.additionalFields.getKey();
+			    			for(Object key :  additional) {
+			    				String keyString = (String) key;
+			    				if(keyString != null) {
+			    					additionalField += keyString +":"+contact.additionalFields.get(keyString)+",";
+			    				}
+			    			}
+			    			ContactBook.append(additionalField.replace(" ", "") + " ");
+		    			}
 		    		}
 				}
 				ContactBook.flush();
@@ -133,6 +214,8 @@ public class Contact implements ContactMethods {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -155,7 +238,14 @@ class ContactApplication {
     	}
         return "no";
     }
-    
+    public static boolean checkFieldContains(String[] headder,String field) {
+    	for (String ColunmField : headder) {
+    		if( ColunmField.equals(field)) {
+    			return(true);
+    		}
+    	}
+    	return(false);
+    }
 //    public static boolean validateMobileNumber(Long MobileNumber) {
 //    	String Mobilenumber = String.valueOf(MobileNumber);
 //    	if(Mobilenumber.length() > 10 || Mobilenumber.length() < 10) {
@@ -168,20 +258,35 @@ class ContactApplication {
 //    	}
 //		return true;    	   	
 //    }
-    
+//    
+    public static String inputFunction(Scanner userInput,String[] Headder) {
+    	String filedData = "";
+    	while(true) {
+			System.out.println("Enter the field name");
+			filedData = userInput.nextLine();
+			if(checkFieldContains(Headder,filedData)) {
+				break;
+			}
+			else {
+				System.out.println("Enter the Valid Field Name");
+			}
+		}
+    	return filedData;
+    }
     public static void main(String[] args) {
         Scanner userInput = new Scanner(System.in);
         Hashmap<String, Contact> Contactlist = new Hashmap<String,Contact>(); 
         int choice = 0;
         String primaryMobileNo = null;
-        String firstName = null,lastName = null,dateOfBirth = null,group = null;
+        String firstName = null,lastName = null,dateOfBirth = null,group = null,address = null,city = null,country = null,email = null,web = null,postalCode = null;
         StringBuffer notes = null ;
         Arraylist<String> AdditionalMobileNo = null;
         Hashmap<String,String> SocialNetworks = null;
+        Hashmap<String,String> additionalFields = null;
         Contact createContact;
         System.out.println("Hi, There you can add ,delete and update your contact here!!");
         while(true){
-            System.out.println("~~~~~~~~~~~~~~~~~~~\n1.Create Contact. \n2.Display the contact list. \n3.Remove The Contact from List.\n4.Update The Contact.\n5.Search Contact from List\n6.Export The contact\n7.Import The Contact\n8.Exit...\n~~~~~~~~~~~~~~~~~~~");
+            System.out.println("~~~~~~~~~~~~~~~~~~~\n1.Create Contact. \n2.Display the contact list. \n3.Remove The Contact from List.\n4.Update The Contact.\n5.Search Contact from List\n6.Export The contacts\n7.Import The Contacts\n8.Exit...\n~~~~~~~~~~~~~~~~~~~");
             try {
                 choice = userInput.nextInt();
             } catch (InputMismatchException e) {
@@ -278,10 +383,72 @@ class ContactApplication {
 		                        choice = userInput.nextInt();
 		                    }
 		                }
+		                System.out.println("If you need to add Address press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the Address");
+							address = userInput.nextLine();
+						}
+						System.out.println("If you need to add City press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the City");
+							city = userInput.nextLine();
+						}
+						System.out.println("If you need to add Country press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the Country");
+							country = userInput.nextLine();
+						}
+						System.out.println("If you need to add PostalCode press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the Postal Code");
+							postalCode = userInput.nextLine();
+						}
+						System.out.println("If you need to add email press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the email");
+							email = userInput.nextLine();
+						}
+						System.out.println("If you need to add web press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the web link");
+							web = userInput.nextLine();
+						}
+						System.out.println("If You Need to add Additional Fields just press 1 else press 0");
+		                choice = userInput.nextInt();
+		                if (choice == 1) {
+		                	additionalFields = new Hashmap<String, String>();
+		                    while (choice == 1) {
+		                        if (choice == 1) {
+		                            String FieldName, FieldValue;
+		                            userInput.nextLine();
+		                            System.out.println("Enter the Field Name :");
+		                            FieldName = userInput.nextLine();
+		                            System.out.println("Enter the Field Value :");
+		                            FieldValue = userInput.nextLine();
+		                            additionalFields.put(FieldName, FieldValue);
+		                        } else {
+		                            choice = 0;
+		                        }
+		                        System.out.println(" press 1 to add or press 0 to skip");
+		                        choice = userInput.nextInt();
+		                    }
+		                }						
 		                System.out.println("Enter Group like Colleague/Friend/Family");
 		                group = userInput.next();
 		                createContact = new Contact();
-		                createContact.addNewContact(firstName, lastName, dateOfBirth, group, notes, primaryMobileNo, AdditionalMobileNo, SocialNetworks);
+		                createContact.addNewContact(firstName, lastName, dateOfBirth, group, notes, primaryMobileNo, AdditionalMobileNo, SocialNetworks,city,country,address,email,web,postalCode,additionalFields);
 		                Contactlist.put(primaryMobileNo, createContact);
 		                System.out.println(Contactlist);
 	               	}
@@ -294,12 +461,13 @@ class ContactApplication {
 						}
             }
             else if( choice == 2){
+            	
             	Object[] MobileNumberKey = Contactlist.getKey();
             	System.out.println("Contact List ...");
                 for (Object Number : MobileNumberKey){
-                	System.out.println(Number);
                     if(Number != null){
-                        Contactlist.get((String) Number).viewContact(Contactlist.get((String) Number));
+                    	System.out.println(Contactlist.get((String) Number));
+                    	Contactlist.get((String) Number).viewContact(Contactlist.get((String) Number));
                     }
                 }
             }
@@ -490,39 +658,225 @@ class ContactApplication {
             	
             }
             else if(choice == 6) {
-            	Contact.ExportContact(Contactlist);
+            	
+            	Contact.ExportContacts(Contactlist);
             }
             else if(choice == 7) {
             	File ContactFile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\format.csv");
             	int count = 0;
-            	String Header[] = null;
-            	Hashmap<String, String> importFileData = null ;
+            	String ContactHeadder = "FirstName LastName DateOfBirth PrimaryNumber AdditionalNumber Group Notes SocialMedia Address City Country PostalCode Email Web";
+            	String Headder[] = null;
+            	Hashmap<String, String> Mapfield = new Hashmap<String,String>();
             	try {
             		if(ContactFile.canRead()) {
             			Scanner fileContent = new Scanner(ContactFile);
             			while(fileContent.hasNextLine()) {
             				String[] Filedata = fileContent.nextLine().split(",");
-            				importFileData = new Hashmap<String,String>();
-            				if(count == 0 ) {
-            					Header = Filedata;
-            				}
             				int index = 0;
-            				for(String Colunmelement : Filedata) {
-            					importFileData.put(Header[index], Colunmelement);
-            					index++;
+            				String filedData = null;
+    	        			firstName = null;
+    	        			lastName = null;
+    	        			dateOfBirth = null;
+    	        			group = null;
+    	        			email = null;
+    	        			address = null;
+    	        			city = null;
+    	        			web = null ;
+    	        			country = null;
+    	        			postalCode = null;
+    	        			notes = null ;
+    	        	        AdditionalMobileNo = null;
+    	        	        SocialNetworks = null;
+    	        	        additionalFields = null;
+            				if(count == 0 ) {
+            					Headder = Filedata;
+		    					System.out.println("Fields in your files are...");
+		    					for (String ColunmElement : Filedata) {
+		    						System.out.print(ColunmElement + " ");
+		    					}
+		    					System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~");
+		    					System.out.println("Fileds Available in Contact Book are...");
+		    					System.out.println(ContactHeadder);
+		    					System.out.println("Map The Fields with Contact Book....");
+	    						userInput.nextLine();
+	    						while(true) {
+	    							System.out.println("Primary Number is Mandatory Map with Contact Book Field");
+	    							filedData = userInput.nextLine();
+	    							if(checkFieldContains(Headder,filedData)) {
+	    								break;
+	    							}
+	    							else {
+	    								System.out.println("Enter the Valid Field Name");
+	    							}
+	    						}  						
+	    						Mapfield.put(filedData, "PrimaryMobileNumber");
+	    						while(true) {
+	    							System.out.println("Map First Name Field with Contact Book");
+	    							filedData = userInput.nextLine();
+	    							if(checkFieldContains(Headder,filedData)) {
+	    								break;
+	    							}
+	    							else {
+	    								System.out.println("Enter the Valid Field Name");
+	    							}
+	    						} 
+	    						Mapfield.put(filedData, "firstName");
+	    						while(true) {
+	    							System.out.println("Map Last Name Field with Contact Book");
+	    							filedData = userInput.nextLine();
+	    							if(checkFieldContains(Headder,filedData)) {
+	    								break;
+	    							}
+	    							else {
+	    								System.out.println("Enter the Valid Field Name");
+	    							}
+	    						} 
+	    						Mapfield.put(filedData, "lastName");
+	    						System.out.println("If you need to map with Date Of Birth Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "DOB");
+	    						}
+	    						System.out.println("If you need to map with Group Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "group");
+	    						}
+	    						System.out.println("If you need to map with Notes Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "Notes");
+	    						}
+	    						System.out.println("If you need to map with Address Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "Address");
+	    						}
+	    						System.out.println("If you need to map with City Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "City");
+	    						}
+	    						System.out.println("If you need to map with Country Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "Country");
+	    						}
+	    						System.out.println("If you need to map with PostalCode Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "PostalCode");
+	    						}
+	    						System.out.println("If you need to map with email Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "email");
+	    						}
+	    						System.out.println("If you need to map with web Field press 1 for skip press 0");
+	    						choice = userInput.nextInt();
+	    						if(choice == 1) {
+	    							userInput.nextLine();
+	    							filedData = inputFunction(userInput, Headder); 
+	    							Mapfield.put(filedData, "web");
+	    						}
+	    						while(true) {
+	    							System.out.println("If You Need to map additional Mobile numbers press 1 or press 0");
+	    							choice = userInput.nextInt();
+	    							if(choice == 1) {
+	    								userInput.nextLine();
+	    								filedData = inputFunction(userInput, Headder); 
+	    								Mapfield.put(filedData, "AdditionalNumber");
+	    							}
+	    							else {
+	    								break;
+	    							}	    							
+	    						}
+	    						while(true) {
+	    							System.out.println("If You Need to map Additional Fields press 1 or press 0");
+	    							choice = userInput.nextInt();
+	    							if(choice == 1) {
+	    								userInput.nextLine();
+	    								filedData = inputFunction(userInput, Headder); 
+	    								Mapfield.put(filedData, "Additional");
+	    							}
+	    							else {
+	    								break;
+	    							}	    							
+	    						}
+	    						System.err.println(Mapfield);
             				}
-            				createContact = new Contact();
-            				createContact.importFunction(importFileData);
-            				Contactlist.put(String.valueOf(count), createContact);
-            				count++;
-            				
+            				if(count > 0) {
+	            				for(String Colunmelement : Filedata) {            					
+	            					if(Mapfield.get(Headder[index]) != null) {
+		            					switch(Mapfield.get(Headder[index])) {
+		            					case "firstName":
+		            						firstName = Colunmelement;
+		            						break;
+		            					case "lastName":
+		            						lastName = Colunmelement;
+		            						break;
+		            					case "PrimaryMobileNumber":
+		            						primaryMobileNo = Colunmelement;
+		            						break;
+		            					case "Country":
+		            						country = Colunmelement;
+		            						break;
+		            					case "PostalCode":
+		            						postalCode  = Colunmelement;
+		            						break;
+		            					case "City":
+		            						city = Colunmelement;
+		            						break;
+		            					case "Address" : 
+		            						address = Colunmelement;
+		            						break;
+		            					case "email":
+		            						email = Colunmelement;
+		            						break;
+		            					case "web":
+		            						web = Colunmelement;
+		            						break;
+		            					case "Additional":
+		            						additionalFields = new Hashmap<String, String>();
+		            						additionalFields.put(Headder[index], Colunmelement);
+		            						break;
+		            					case "AdditionalNumber" : 
+		            						AdditionalMobileNo = new Arraylist<String>();
+		            						AdditionalMobileNo.add(Colunmelement);
+		            						break;
+		            					}
+	            					}
+	            					index++;
+	            				}
+	            				createContact = new Contact();
+	            				createContact.addNewContact(firstName, lastName, dateOfBirth, group, notes, primaryMobileNo, AdditionalMobileNo, SocialNetworks,city,country,address,email,web,postalCode,additionalFields);
+	     		                Contactlist.put(primaryMobileNo, createContact);
+            				}
+            				count++;            				
             			}
             			fileContent.close();
             		}
+            		System.out.println(Contactlist.Mapsize());
             		System.out.println(count);
             	}
             	catch (Exception e) {
-            		System.out.println("Exception occured");
+            		System.out.println("Exception occured" + e);
 				}
             }
             else if(choice == 8) {
