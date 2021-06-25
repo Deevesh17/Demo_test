@@ -20,12 +20,12 @@ class ContactAddress{
 public class Contact implements ContactMethods {
     private String firstName,lastName,dateOfBirth,group, primaryMobileNo,email,web;
     StringBuffer Notes;
-    private Arraylist<String> AdditionalMobileNo = new Arraylist<String>();
+    private Hashmap<String,String> AdditionalMobileNo = new Hashmap<String,String>();
     private Hashmap<String,String> SocialNetworks = new Hashmap<String, String>();
     public Hashmap<String,String> additionalFields  = new Hashmap<String, String>();
     ContactAddress addressDetails;
     public void addNewContact(String firstName,String lastName,String dateOfBirth,String group,
-                              StringBuffer Notes,String primaryMobileNo,Arraylist<String> AdditionalMobileNo,Hashmap<String,String> SocialNetworks,String city,String country,String address,String email,String web,String PostalCode,Hashmap<String, String> additionalFields ) {
+                              StringBuffer Notes,String primaryMobileNo, Hashmap<String,String> AdditionalMobileNo,Hashmap<String,String> SocialNetworks,String city,String country,String address,String email,String web,String PostalCode,Hashmap<String, String> additionalFields ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -43,7 +43,7 @@ public class Contact implements ContactMethods {
         this.web = web;
         this.additionalFields = additionalFields;
     }
-    public void updateFullNameAndLastname(Contact contact,String firstName, String lastname,String dob, String group) {
+    public void updateFullNameAndLastname(Contact contact,String firstName, String lastname,String dob, String group,String address,String city,String country,String postalCode,String email,String web) {
     	if(firstName != null) {
     		contact.firstName = firstName;
     	}
@@ -56,12 +56,58 @@ public class Contact implements ContactMethods {
     	if(group != null) {
     		contact.group = group;
     	}
+    	if(address != null) {
+    		contact.addressDetails.address = address;
+    	}
+    	if(city != null) {
+    		contact.addressDetails.city = city;
+    	}
+    	if(country != null) {
+    		contact.addressDetails.country = country;
+    	}
+    	if(postalCode != null) {
+    		contact.addressDetails.postalCode = postalCode;
+    	}
+    	if(email != null) {
+    		contact.email = email;
+    	}
+    	if(web != null) {
+    		contact.web = web;
+    	}
+    }
+    public static void searchContact(Hashmap<String, Contact> contactList,String searchvalue) {
+    	int flag = 0;
+    	for(Object value : contactList.getValue()) {
+    		Contact contact = (Contact) value;
+    		if(contact.firstName.startsWith(searchvalue)) {
+    			contact.viewContact(contact);
+    			flag += 1;
+    		}
+    		else if(contact.primaryMobileNo.startsWith(searchvalue)) {
+    			contact.viewContact(contact);
+    			flag += 1;
+    		}
+    		else {
+    			
+    			for(Object mobileNumber : contact.AdditionalMobileNo.getValue() ) {
+    				String MobileNumber = String.valueOf(mobileNumber);
+    				if(MobileNumber.startsWith(searchvalue)) {
+    					flag += 1;
+    					contact.viewContact(contact);
+    				}
+    			}    			
+    		}
+    	}
+    	System.out.println("Search Result is " + flag);
     }
     public void updateSocialNetwork(Contact contact,String domain, String domainLink ) {
     	contact.SocialNetworks.put(domain, domainLink);
     }
-    public void updateAdditionalMobileNumber(Contact contact,String Number ) {
-    	contact.AdditionalMobileNo.add(Number);
+    public void updateadditionalFields(Contact contact,String FieldName, String FieldValue ) {
+    	contact.additionalFields.put(FieldName, FieldValue);
+    }
+    public void updateAdditionalMobileNumber(Contact contact,String Number,String NumberFiled ) {
+    	contact.AdditionalMobileNo.put(Number,NumberFiled);
     }
     public void updateNotes(Contact contact,String notes ) {
     	contact.Notes.append(notes);
@@ -78,11 +124,8 @@ public class Contact implements ContactMethods {
     		System.out.println("Primary Mobile Number : " + contact.primaryMobileNo);
     	}
     	if(contact.AdditionalMobileNo != null) {
-	    	if(contact.AdditionalMobileNo.ArraySize() != 0) {
-	    		System.out.println("Alternative Mobile Number : ");
-	    		for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
-	    			System.out.println(contact.AdditionalMobileNo.get(index));
-	    		}
+    		if(contact.AdditionalMobileNo.Mapsize() != 0 ) {
+	    		System.out.println( contact.AdditionalMobileNo);
 	    	}
     	}
 	    if(contact.dateOfBirth != null) {
@@ -93,7 +136,7 @@ public class Contact implements ContactMethods {
     	}
     	if(contact.SocialNetworks != null) {
 	    	if(contact.SocialNetworks.Mapsize() != 0 ) {
-	    		System.out.println("Social Networks Domain and Link : \n" + contact.SocialNetworks);
+	    		System.out.println(contact.SocialNetworks);
 	    	}
     	}
     	if(contact.Notes != null) {
@@ -118,18 +161,38 @@ public class Contact implements ContactMethods {
     		System.out.println(contact.additionalFields);
     	}
     }
+    public static boolean checkFieldAvailable(String field_name, Hashmap<String,String> dynamicHash){
+    	if(dynamicHash != null){
+			Object[] additional = dynamicHash.getKey();
+			for(Object key :  additional) {
+				String keyString = (String) key;
+				if(keyString.equals(field_name) ){
+					return true;
+				}
+			}
+		}
+
+    	return false;
+    }
     public boolean ifExists(Contact contact,String MobileNumber){
-    	if(contact.AdditionalMobileNo.contains(MobileNumber)){
-            return true;
-        }	
+    	for(Object value : contact.AdditionalMobileNo.getValue()) {
+			String valueString = (String) value;
+			if(valueString != null) {
+				if(valueString .equals(MobileNumber)) {
+					return true;
+				}
+			}
+		}
+    		
         return false;        
     }
-    public static void ExportContacts(Hashmap<String, Contact> ContactList) {
-    	String Headder = "FullName DateOfBirth PrimaryNumber AdditionalNumber Group Notes SocialMedia Address City Country PostalCode AdditionalFields";
+    public static void ExportContacts(Hashmap<String, Contact> ContactList,String headderField) {
+    	String Headder = "FullName DateOfBirth PrimaryNumber Group Notes Address City Country PostalCode " + headderField;
+    	String[] additionalHeadderArray = headderField.split(" ");
 		try {
 			File Contactfile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\ContactBook.csv");
 				FileWriter ContactBook = new FileWriter(Contactfile);
-				ContactBook.append(Headder);
+				ContactBook.append(Headder.toUpperCase());
 				for(Object contactObject : ContactList.getValue()) {
 		    		Contact contact= (Contact) contactObject;
 		    		String additionalNumber = "",sociaMedia = "",additionalField = "";
@@ -143,16 +206,6 @@ public class Contact implements ContactMethods {
 		    				ContactBook.append(" ");
 		    			}
 		    			ContactBook.append(contact.primaryMobileNo + " ");
-		    			
-		    			if(contact.AdditionalMobileNo != null) {
-			    			for(int index = 0;index < contact.AdditionalMobileNo.ArraySize();index++) {
-			    	        	additionalNumber += contact.AdditionalMobileNo.get(index) ;
-			    	        	if(index != contact.AdditionalMobileNo.ArraySize() - 1) {
-			    	        		additionalNumber+=",";
-			    	        	}
-			    	        }
-		    			}
-		    			ContactBook.append(additionalNumber + " ");
 		    			if(contact.group != null) {
 		    				ContactBook.append(contact.group + " ");
 		    			}
@@ -165,13 +218,6 @@ public class Contact implements ContactMethods {
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			for(Object key : contact.SocialNetworks.getKey()) {
-		    				String keyString = (String) key;
-		    				if(keyString != null) {
-		    					sociaMedia += keyString +":"+contact.SocialNetworks.get(keyString)+",";
-		    				}
-		    			}
-		    			ContactBook.append(sociaMedia + " ");
 		    			if(contact.addressDetails.address != null) {
 		    				ContactBook.append(contact.addressDetails.address.replace(" ","") + " ");
 		    			}
@@ -196,15 +242,19 @@ public class Contact implements ContactMethods {
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			if(contact.additionalFields != null){
-			    			Object[] additional = contact.additionalFields.getKey();
-			    			for(Object key :  additional) {
-			    				String keyString = (String) key;
-			    				if(keyString != null) {
-			    					additionalField += keyString +":"+contact.additionalFields.get(keyString)+",";
-			    				}
-			    			}
-			    			ContactBook.append(additionalField.replace(" ", "") + " ");
+		    			for(String fields :additionalHeadderArray){
+		    				if(checkFieldAvailable(fields, contact.AdditionalMobileNo)) {
+		    					ContactBook.append(contact.AdditionalMobileNo.get(fields).replace(" ","") + " ");
+		    				}
+		    				else if(checkFieldAvailable(fields, contact.SocialNetworks)) {
+		    					ContactBook.append(contact.SocialNetworks.get(fields).replace(" ","") + " ");
+		    				}    				
+		    				else if(checkFieldAvailable(fields, contact.additionalFields)) {
+		    					ContactBook.append(contact.additionalFields.get(fields).replace(" ","") + " ");
+		    				}
+		    				else {
+		    					ContactBook.append(" ");
+		    				}		    				
 		    			}
 		    		}
 				}
@@ -256,7 +306,16 @@ class ContactApplication {
 //    			return false;
 //    		}
 //    	}
-//		return true;    	   	
+//		return true;    
+//    while(true) {
+//    	
+//   		if(validateMobileNumber(additionalMobileNumber)) {
+//   			break;
+//   		}
+//   		else {
+//   			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
+//   		}
+//   	}
 //    }
 //    
     public static String inputFunction(Scanner userInput,String[] Headder) {
@@ -280,7 +339,8 @@ class ContactApplication {
         String primaryMobileNo = null;
         String firstName = null,lastName = null,dateOfBirth = null,group = null,address = null,city = null,country = null,email = null,web = null,postalCode = null;
         StringBuffer notes = null ;
-        Arraylist<String> AdditionalMobileNo = null;
+        Hashmap<String,String> AdditionalMobileNo = null;
+        Hashmap<String, String> additionalfield = new Hashmap<String, String>();
         Hashmap<String,String> SocialNetworks = null;
         Hashmap<String,String> additionalFields = null;
         Contact createContact;
@@ -303,46 +363,44 @@ class ContactApplication {
 	                dateOfBirth = userInput.nextLine();
 	                System.out.println("Enter the Person Primary Mobile Number");
 	                primaryMobileNo = userInput.nextLine();
-//	               	while(true) {
-//	               		primaryMobileNo = userInput.nextLine();
-////	               		if(validateMobileNumber(primaryMobileNo)) {
-////	               			break;
-////	               		}
-//	               		else {
-//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
-//	               		}
-//	               	}	                
-	               	
-	               	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals("yes") )
+	               	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals("yes")  )
 	               	{
 	               		System.err.println("Mobile Number Already Exists You can Update by clicking 4");
 	               	}
 	               	else {
-	               		AdditionalMobileNo = new Arraylist<String>();
+	               		AdditionalMobileNo = new  Hashmap<String,String>();
+	               		int homecount = 1,officecount= 1,landlinecount = 1;
 		                while (choice == 1) {
 		                    System.out.println("If You Need to add Alternative mobile number just press 1 else press 0");
 		                    choice = userInput.nextInt();
 		                    userInput.nextLine();
 		                    String additionalMobileNumber;
 		                    if (choice == 1) {
+		                    	System.out.println("Enter the Number Type Like Home/Office/Landline");
+		                    	String mobileNumberField = userInput.nextLine().toUpperCase();
+		                    	
 		                        System.out.println("Enter the Person Mobile Number :");
 		                        additionalMobileNumber = userInput.nextLine();
-//		                        while(true) {
-//		                        	
-//		    	               		if(validateMobileNumber(additionalMobileNumber)) {
-//		    	               			break;
-//		    	               		}
-//		    	               		else {
-//		    	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
-//		    	               		}
-//		    	               	}
-		                        if(AdditionalMobileNo.contains(additionalMobileNumber) || ifExist(Contactlist, additionalMobileNumber,"search").equals(1L) || primaryMobileNo.equals(additionalMobileNumber) || Contactlist.ifExist(additionalMobileNumber) )
-		                        {
-		                        	System.err.println("Mobile Number Already Exists");
-		                        }
-		                        else {
-		                        	AdditionalMobileNo.add(additionalMobileNumber);
-		                        }
+		                    	if(Contactlist.ifExist(additionalMobileNumber) || ifExist(Contactlist, additionalMobileNumber,"search").equals("yes") || AdditionalMobileNo.ifExist(additionalMobileNumber) || additionalMobileNumber.equals(primaryMobileNo) )
+		    	               	{
+		    	               		System.err.println("Mobile Number Already Exists You can Update by clicking 4");
+		    	               	}
+		                    	else {
+		                    		if(mobileNumberField.equalsIgnoreCase("HOME")) {
+			                    		mobileNumberField += String.valueOf(homecount);
+			                    		homecount++;
+			                    	}
+		                    		if(mobileNumberField.equalsIgnoreCase("OFFICE")) {
+		                    			mobileNumberField += String.valueOf(officecount);
+			                    		officecount++;
+		                    		}
+	                    			if(mobileNumberField.equalsIgnoreCase("LANDLINE")) {
+	                    				mobileNumberField += String.valueOf(landlinecount);
+			                    		landlinecount++;
+	                    			}
+			                        AdditionalMobileNo.put( mobileNumberField,additionalMobileNumber);
+			                        additionalfield.put(mobileNumberField, mobileNumberField);
+		                    	}
 		                    } else {
 		                        choice = 0;
 		                    }
@@ -360,6 +418,7 @@ class ContactApplication {
 		                            System.out.println("Enter the Person Social Media Domain Link :");
 		                            domainLink = userInput.nextLine();
 		                            SocialNetworks.put(domain, domainLink);
+		                            additionalfield.put(domain, domainLink);
 		                        } else {
 		                            choice = 0;
 		                        }
@@ -435,9 +494,11 @@ class ContactApplication {
 		                            userInput.nextLine();
 		                            System.out.println("Enter the Field Name :");
 		                            FieldName = userInput.nextLine();
+		                           
 		                            System.out.println("Enter the Field Value :");
 		                            FieldValue = userInput.nextLine();
 		                            additionalFields.put(FieldName, FieldValue);
+		                            additionalfield.put(FieldName, FieldValue);
 		                        } else {
 		                            choice = 0;
 		                        }
@@ -472,19 +533,13 @@ class ContactApplication {
                 }
             }
             else if(choice == 3) {
-            	System.out.println("Please Enter the Person Mobile Number");
+            	System.out.println("Please Enter the Person Full Name or Moblile Number");
             	try {
             		userInput.nextLine();
+            		String searchpreffix = userInput.nextLine();
+	            	Contact.searchContact(Contactlist,searchpreffix );
+	            	System.out.println("Please Enter the Person Primary Mobile Number");
             		primaryMobileNo = userInput.nextLine();
-//            		while(true) {
-//	               		primaryMobileNo = userInput.nextLong();
-//	               		if(validateMobileNumber(primaryMobileNo)) {
-//	               			break;
-//	               		}
-//	               		else {
-//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
-//	               		}
-//	               	}
 	            	if(Contactlist.ifExist(primaryMobileNo)) {
 	            		Contactlist.remove(primaryMobileNo);
 	            	}
@@ -501,19 +556,13 @@ class ContactApplication {
 					}
             }
             else if(choice == 4) {
-            	System.out.println("Please Enter the Person Mobile Number");
+            	System.out.println("Please Enter the Person Full Name or Moblile Number");
             	try {
             		userInput.nextLine();
+            		String searchpreffix = userInput.nextLine();
+	            	Contact.searchContact(Contactlist,searchpreffix );
+	            	System.out.println("Please Enter the Person Primary Mobile Number");
             		primaryMobileNo = userInput.nextLine();
-//            		while(true) {
-//	               		primaryMobileNo = userInput.nextLong();
-//	               		if(validateMobileNumber(primaryMobileNo)) {
-//	               			break;
-//	               		}
-//	               		else {
-//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
-//	               		}
-//	               	}
 	            	Contact contact;
 	            	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals(1L)) {
 	            		if(Contactlist.ifExist(primaryMobileNo)) {
@@ -525,12 +574,18 @@ class ContactApplication {
 	            		}
 	            		contact.viewContact(contact);
 	            		System.out.println();
-	            		System.out.println("If You Need To update FullName or Date Of Birth or group  press 1 or press 0 to skip");
+	            		System.out.println("If You Need To update FirstName and Lastname press 1 or press 0 to skip");
 	            		choice = userInput.nextInt();
 	        			firstName = null;
 	        			lastName = null;
 	        			dateOfBirth = null;
 	        			group = null;
+	        			email = null;
+	        			address = null;
+	        			city = null;
+	        			web = null ;
+	        			country = null;
+	        			postalCode = null;
 	            		if(choice == 1) {
 	            			userInput.nextLine();		
 	            			System.out.println("Enter the Person First Name and Last Name:");
@@ -548,8 +603,7 @@ class ContactApplication {
 	                    if(choice == 1) {
 	                        System.out.println("Enter Group like Colleague/Friend/Family");
 	    	                group = userInput.next();
-	                    }
-	                    contact.updateFullNameAndLastname(contact, firstName,lastName, dateOfBirth, group);
+	                    }	                    
 	            		System.out.println("If You Need To add Social Network press 1 or press 0 to skip");
 	            		choice = userInput.nextInt();
 	                    while (choice == 1) {
@@ -561,6 +615,7 @@ class ContactApplication {
 	                            System.out.println("Enter the Person Social Media Domain Link :");
 	                            domainLink = userInput.nextLine();
 	                            contact.updateSocialNetwork(contact,domain, domainLink);
+	                            additionalfield.put(domain, domainLink);
 	                        } else {
 	                            choice = 0;
 	                        }
@@ -571,19 +626,33 @@ class ContactApplication {
 	            		choice = userInput.nextInt();
 	                    while (choice == 1) {
 	                        if (choice == 1) {
-	                            userInput.nextLine();
-	                            System.out.println("Enter the Person Mobile Number :");
-	                            primaryMobileNo = userInput.nextLine();
-//	                            while(true) {
-//	                            	primaryMobileNo = userInput.nextLong();
-//		    	               		if(validateMobileNumber(primaryMobileNo)) {
-//		    	               			break;
-//		    	               		}
-//		    	               		else {
-//		    	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
-//		    	               		}
-//		    	               	}
-	                            contact.updateAdditionalMobileNumber(contact, primaryMobileNo);
+	                        	userInput.nextLine();
+	                        	System.out.println("Enter the Number Type Like Home/Office/Landline");
+		                    	String mobileNumberField = userInput.nextLine().toUpperCase();
+		                    	int homecount = 1,officecount= 1,landlinecount = 1;
+		                    
+		                        System.out.println("Enter the Person Mobile Number :");
+		                        String additionalMobileNumber = userInput.nextLine();
+		                    	if(Contactlist.ifExist(additionalMobileNumber) || ifExist(Contactlist, additionalMobileNumber,"search").equals("yes") || AdditionalMobileNo.ifExist(additionalMobileNumber) || additionalMobileNumber.equals(primaryMobileNo) )
+		    	               	{
+		    	               		System.err.println("Mobile Number Already Exists You can Update by clicking 4");
+		    	               	}
+		                    	else {
+		                    		if(mobileNumberField.equalsIgnoreCase("HOME")) {
+			                    		mobileNumberField += String.valueOf(homecount);
+			                    		homecount++;
+			                    	}
+		                    		if(mobileNumberField.equalsIgnoreCase("OFFICE")) {
+		                    			mobileNumberField += String.valueOf(officecount);
+			                    		officecount++;
+		                    		}
+	                    			if(mobileNumberField.equalsIgnoreCase("LANDLINE")) {
+	                    				mobileNumberField += String.valueOf(landlinecount);
+			                    		landlinecount++;
+	                    			}
+			                        contact.updateAdditionalMobileNumber(contact, additionalMobileNumber, mobileNumberField);
+			                        additionalfield.put(mobileNumberField, mobileNumberField);
+		                    	}
 	                        } else {
 	                            choice = 0;
 	                        }
@@ -606,6 +675,71 @@ class ContactApplication {
 		                        choice = userInput.nextInt();
 		                    }
 		                }
+		                System.out.println("If you need to update Address press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the Address");
+							address = userInput.nextLine();
+						}
+						System.out.println("If you need to update City press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the City");
+							city = userInput.nextLine();
+						}
+						System.out.println("If you need to update Country press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the Country");
+							country = userInput.nextLine();
+						}
+						System.out.println("If you need to update PostalCode press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the Postal Code");
+							postalCode = userInput.nextLine();
+						}
+						System.out.println("If you need to update email press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the email");
+							email = userInput.nextLine();
+						}
+						System.out.println("If you need to update web press 1 for skip press 0");
+						choice = userInput.nextInt();
+						if(choice == 1) {
+							userInput.nextLine();
+							System.out.println("Enter the web link");
+							web = userInput.nextLine();
+						}
+						System.out.println("If You Need to update Additional Fields just press 1 else press 0");
+		                choice = userInput.nextInt();
+		                if (choice == 1) {
+		                	additionalFields = new Hashmap<String, String>();
+		                    while (choice == 1) {
+		                        if (choice == 1) {
+		                            String FieldName, FieldValue;
+		                            userInput.nextLine();
+		                            System.out.println("Enter the Field Name :");
+		                            FieldName = userInput.nextLine();
+		                            System.out.println("Enter the Field Value :");
+		                            FieldValue = userInput.nextLine();
+		                            contact.updateadditionalFields(contact, FieldName, FieldValue);
+		                            additionalfield.put(FieldName, FieldValue);
+		                        } else {
+		                            choice = 0;
+		                        }
+		                        
+		                        System.out.println(" press 1 to add or press 0 to skip");
+		                        choice = userInput.nextInt();
+		                    }
+		                }						
+		                contact.updateFullNameAndLastname(contact, firstName,lastName, dateOfBirth, group,address,city,country,postalCode,email,web);
 	                    contact.viewContact(contact);
 	            	}
 	            else {
@@ -620,33 +754,12 @@ class ContactApplication {
 					}
             }
             else if(choice == 5) {
-            	System.out.println("Please Enter the Person Mobile Number");
+            	System.out.println("Please Enter the Person Full Name or Moblile Number");
             	try {
             		userInput.nextLine();
-            		primaryMobileNo = userInput.nextLine();
-//            		while(true) {
-//	               		primaryMobileNo = userInput.nextLong();
-//	               		if(validateMobileNumber(primaryMobileNo)) {
-//	               			break;
-//	               		}
-//	               		else {
-//	               			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
-//	               		}
-//	               	}
+            		String searchpreffix = userInput.nextLine();
 	            	Contact contact;
-	            	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals(1L)) {
-	            		if(Contactlist.ifExist(primaryMobileNo)) {
-	            			contact = Contactlist.get(primaryMobileNo);
-	            		}
-	            		else {
-	            			primaryMobileNo = ifExist(Contactlist, primaryMobileNo,"remove");
-	            			contact = Contactlist.get(primaryMobileNo);
-	            		}
-	            		contact.viewContact(contact);
-	            	}
-	            	else {
-	                	System.out.println("The Mobile Number You Entred is not available in your Contact list You can add it by creating the contact...");
-	                }
+	            	Contact.searchContact(Contactlist,searchpreffix );
 	            	}catch (InputMismatchException e) {
 	            	System.out.println("Invalid Input");	
 	            	userInput.nextLine();
@@ -658,8 +771,14 @@ class ContactApplication {
             	
             }
             else if(choice == 6) {
-            	
-            	Contact.ExportContacts(Contactlist);
+            	String headders = "";
+            	for(Object addfield : additionalfield.getKey()) {
+            		String field = (String) addfield;
+            		if(field != null) {
+            			headders += field + " ";
+            		}
+            	}
+            	Contact.ExportContacts(Contactlist,headders);
             }
             else if(choice == 7) {
             	File ContactFile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\format.csv");
@@ -855,10 +974,12 @@ class ContactApplication {
 		            					case "Additional":
 		            						additionalFields = new Hashmap<String, String>();
 		            						additionalFields.put(Headder[index], Colunmelement);
+		            						additionalfield.put(Headder[index], Colunmelement);
 		            						break;
 		            					case "AdditionalNumber" : 
-		            						AdditionalMobileNo = new Arraylist<String>();
-		            						AdditionalMobileNo.add(Colunmelement);
+		            						AdditionalMobileNo = new Hashmap<String, String>();
+		            						AdditionalMobileNo.put(Headder[index], Colunmelement);
+		            						additionalfield.put(Headder[index], Colunmelement);
 		            						break;
 		            					}
 	            					}
