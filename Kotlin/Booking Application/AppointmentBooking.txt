@@ -1,0 +1,194 @@
+package com.example.kotlin
+
+import java.lang.NullPointerException
+import java.util.*
+
+class Service{
+    private var service_name : String = ""
+    private var service_duration : Double = 0.0
+    private var service_cost : Long = 0
+    private var service_provider = arrayListOf<Staff?>()
+    constructor(service_name : String ,service_duration : Double , service_cost : Long) {
+        this.service_name = service_name
+        this.service_duration = service_duration
+        this.service_cost = service_cost
+    }
+    fun addServiceProvider(service: Service, service_provider: Staff?){
+        service.service_provider.add(service_provider)
+        println(service.service_provider)
+    }
+    fun returnStaffDetals(service : Service){
+        for(staff_name in service.service_provider){
+            if(staff_name != null){
+                println( " ${staff_name!!.getFieldName(staff_name,"staff_full_name")} : ${staff_name!!.getFieldName(staff_name,"staff_full_name")} ")
+            }
+        }
+    }
+}
+class Staff{
+    private var staff_id : String = ""
+    private var staff_first_name : String = ""
+    private var staff_last_name : String = ""
+    private var staff_working_hours : String = ""
+    private var start_time : String = ""
+    private var  end_time : String = ""
+    private var staff_service = arrayListOf<Service?>()
+    constructor(staff_first_name : String,staff_last_name : String,staff_working_hours : String,start_time : String,end_time : String,staff_id : String){
+        this.staff_id = staff_id
+        this.staff_first_name = staff_first_name
+        this.staff_last_name = staff_last_name
+        this.staff_working_hours = staff_working_hours
+        this.start_time = start_time
+        this.end_time = end_time
+    }
+    fun addService(staff: Staff, staff_service: Service?){
+        staff.staff_service.add(staff_service)
+        println(staff.staff_service)
+    }
+    fun getFieldName(staff : Staff, fieldName : String) : Any{
+        when(fieldName){
+            "staff_full_name" -> return (staff.staff_first_name + " " + staff.staff_last_name)
+            "staff_id" -> return (staff.staff_id)
+        }
+        return ""
+    }
+
+}
+class Customer{
+    private var Customer_id : String = ""
+    private var customer_first_name : String = ""
+    private var customer_last_name : String = ""
+    private var customer_mobile_number : Long = 0
+    private var booking_time : String = ""
+    private var booking_service = ""
+    private var staff_for_service = ""
+    constructor(customer_id : String,customer_first_name : String,customer_last_name : String,customer_mobile_number : Long){
+        this.Customer_id = customer_id
+        this.customer_first_name = customer_first_name
+        this.customer_last_name = customer_last_name
+        this.customer_mobile_number = customer_mobile_number
+    }
+}
+fun GetFromUserString(userInput : Scanner, InputFieldName : String) : String{
+    println("Enter The $InputFieldName : ")
+    return userInput.nextLine();
+}
+fun GetFromUserDouble(userInput : Scanner, InputFieldName : String) : Double{
+    println("Enter The $InputFieldName : ")
+    return userInput.nextDouble();
+}
+fun GetFromUserLong(userInput : Scanner, InputFieldName : String) : Long{
+    println("Enter The $InputFieldName : ")
+    return userInput.nextLong();
+}
+fun main() {
+    var userInput = Scanner(System.`in`)
+    var serviceList = hashMapOf<String,Service>()
+    var staffList = hashMapOf<String,Staff>()
+    var customerList = hashMapOf<String,Customer>()
+    var customer_count : Long = 10001
+    var staff_count : Long = 10001
+    var service_name : String = ""
+    var service_duration : Double = 0.0
+    var service_cost : Long = 0
+    var first_name : String = ""
+    var last_name : String = ""
+    var staff_working_hours : String = ""
+    var start_time : String = ""
+    var end_time : String = ""
+    var customer_mobile_number : Long = 0
+    var userChoice = 0
+    fun serviceAvailable(){
+        for (service in serviceList.keys)
+        {
+            println(service)
+        }
+    }
+    while(true){
+        println("1.Create Service.\n2.Create Staff.\n3.Create Customer.\n4.Book Appointment")
+        try {
+            userChoice = userInput.nextInt()
+            if (userChoice == 1) {
+                try {
+                    userInput.nextLine()
+                    service_name = GetFromUserString(userInput, "Service Name")
+                    service_duration = GetFromUserDouble(userInput, "Service Duration in minutes")
+                    service_cost = GetFromUserLong(userInput, "Cost for Service")
+                    var service = Service(service_name, service_duration, service_cost)
+                    serviceList.put(service_name, service)
+                    println(serviceList)
+                } catch (e: Exception) {
+                    userInput.nextLine();
+                    println("Invalid Input")
+                }
+            } else if (userChoice == 2) {
+                userInput.nextLine()
+                first_name = GetFromUserString(userInput, "Staff First Name")
+                last_name = GetFromUserString(userInput, "Staff Last Name")
+                staff_working_hours =
+                    GetFromUserString(userInput, "Staff Working Hours (eg : 8-Hrs)")
+                start_time = GetFromUserString(userInput, "Starting Time (eg : 10-AM)")
+                end_time = GetFromUserString(userInput, "End Time(eg : 7-PM)")
+                var staff = Staff(
+                    first_name,
+                    last_name,
+                    staff_working_hours,
+                    start_time,
+                    end_time,
+                    first_name + staff_count
+                )
+                println("Service Available, if your service not in list you can create by Create Service...")
+                serviceAvailable()
+                try {
+                    service_name = GetFromUserString(userInput, "Service Name")
+                    staff.addService(staff, serviceList.get(service_name))
+                    staffList.put(first_name + staff_count, staff)
+                    var service = serviceList.get(service_name)
+                    service!!.addServiceProvider(service, staff)
+                    staff_count++
+                    println(staffList)
+                } catch (e: NullPointerException) {
+                    println("service your entered is not available")
+                }
+            } else if (userChoice == 3) {
+                userInput.nextLine()
+                first_name = GetFromUserString(userInput, "Customer First Name")
+                last_name = GetFromUserString(userInput, "Customer Last Name")
+                customer_mobile_number = GetFromUserLong(userInput, "Customer Mobile Number")
+                var customer = Customer(
+                    first_name + customer_count,
+                    first_name,
+                    last_name,
+                    customer_mobile_number
+                )
+                println("Here's your Customer ID : ${first_name + customer_count}")
+                customerList.put(first_name + customer_count, customer)
+                customer_count++
+                println(customerList)
+            } else if (userChoice == 4) {
+                userInput.nextLine()
+                println("Service Available, if your service not in list you can create by Create Service...")
+                serviceAvailable()
+                try {
+                    service_name = GetFromUserString(userInput, "Select Service available")
+                    var service = serviceList.get(service_name)
+                    service!!.returnStaffDetals(service)
+                    var staff_id = GetFromUserString(userInput, "Select Staff ID")
+                    var staff = staffList.get(staff_id)
+                    println(Calendar.getInstance())
+                } catch (e: NullPointerException) {
+                    println("service your entered is not available")
+                }
+            }
+        }
+        catch (E : InputMismatchException){
+            userInput.nextLine();
+            println("Invalid Input")
+        }
+        catch (E : Exception){
+            userInput.nextLine();
+            println("Exception Occurs $E")
+        }
+    }
+}
+

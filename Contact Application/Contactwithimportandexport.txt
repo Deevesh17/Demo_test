@@ -19,11 +19,11 @@ class ContactAddress{
 }
 public class Contact implements ContactMethods {
     private String firstName,lastName,dateOfBirth,group, primaryMobileNo,email,web;
-    StringBuffer Notes;
+    private StringBuffer Notes;
     private Hashmap<String,String> AdditionalMobileNo = new Hashmap<String,String>();
     private Hashmap<String,String> SocialNetworks = new Hashmap<String, String>();
-    public Hashmap<String,String> additionalFields  = new Hashmap<String, String>();
-    ContactAddress addressDetails;
+    private Hashmap<String,String> additionalFields  = new Hashmap<String, String>();
+    private ContactAddress addressDetails;
     public void addNewContact(String firstName,String lastName,String dateOfBirth,String group,
                               StringBuffer Notes,String primaryMobileNo, Hashmap<String,String> AdditionalMobileNo,Hashmap<String,String> SocialNetworks,String city,String country,String address,String email,String web,String PostalCode,Hashmap<String, String> additionalFields ) {
         this.firstName = firstName;
@@ -43,6 +43,70 @@ public class Contact implements ContactMethods {
         this.web = web;
         this.additionalFields = additionalFields;
     }
+    public String getcontactElements(Contact contact , String ValueNeedTobeReturn) {
+    	if(ValueNeedTobeReturn.equals("firstName"))
+    	{
+    		return contact.firstName;
+    	}
+    	else if(ValueNeedTobeReturn.equals("lastName"))
+    	{
+    		return contact.lastName;
+    	}
+    	else if(ValueNeedTobeReturn.equals("primaryMobileNo"))
+    	{
+    		return contact.primaryMobileNo;
+    	}
+    	else if(ValueNeedTobeReturn.equals("email"))
+    	{
+    		return contact.email;
+    	}
+    	else if(ValueNeedTobeReturn.equals("web"))
+    	{
+    		return contact.web;
+    	}
+    	else if(ValueNeedTobeReturn.equals("dob"))
+    	{
+    		return contact.dateOfBirth;
+    	}
+    	else if(ValueNeedTobeReturn.equals("group"))
+    	{
+    		return contact.group;
+    	}
+    	else if(ValueNeedTobeReturn.equals("address"))
+    	{
+    		return contact.addressDetails.address;
+    	}
+    	else if(ValueNeedTobeReturn.equals("city"))
+    	{
+    		return contact.addressDetails.city;
+    	}
+    	else if(ValueNeedTobeReturn.equals("country"))
+    	{
+    		return contact.addressDetails.country;
+    	}
+    	else if(ValueNeedTobeReturn.equals("postal"))
+    	{
+    		return contact.addressDetails.postalCode;
+    	}
+    	return "";
+    }
+    public StringBuffer getNotes(Contact contact) {
+    	return contact.Notes;
+	}
+    public Hashmap<String, String> getcontactElementsMap(Contact contact,String ValueNeedTobeReturn){
+    	Hashmap<String, String> EmptyReturnHashMap = null;
+    	if(ValueNeedTobeReturn.equals("AdditionalMobileNo")){
+    		return contact.AdditionalMobileNo;
+    	}
+    	if(ValueNeedTobeReturn.equals("SocialMedia")){
+    		return contact.SocialNetworks;
+    	}
+    	if(ValueNeedTobeReturn.equals("Additionalfield")){
+    		return contact.additionalFields;
+    	}
+		return EmptyReturnHashMap;
+    }
+
     public void updateFullNameAndLastname(Contact contact,String firstName, String lastname,String dob, String group,String address,String city,String country,String postalCode,String email,String web) {
     	if(firstName != null) {
     		contact.firstName = firstName;
@@ -75,31 +139,7 @@ public class Contact implements ContactMethods {
     		contact.web = web;
     	}
     }
-    public static void searchContact(Hashmap<String, Contact> contactList,String searchvalue) {
-    	int flag = 0;
-    	for(Object value : contactList.getValue()) {
-    		Contact contact = (Contact) value;
-    		if(contact.firstName.startsWith(searchvalue)) {
-    			contact.viewContact(contact);
-    			flag += 1;
-    		}
-    		else if(contact.primaryMobileNo.startsWith(searchvalue)) {
-    			contact.viewContact(contact);
-    			flag += 1;
-    		}
-    		else {
-    			
-    			for(Object mobileNumber : contact.AdditionalMobileNo.getValue() ) {
-    				String MobileNumber = String.valueOf(mobileNumber);
-    				if(MobileNumber.startsWith(searchvalue)) {
-    					flag += 1;
-    					contact.viewContact(contact);
-    				}
-    			}    			
-    		}
-    	}
-    	System.out.println("Search Result is " + flag);
-    }
+    
     public void updateSocialNetwork(Contact contact,String domain, String domainLink ) {
     	contact.SocialNetworks.put(domain, domainLink);
     }
@@ -107,10 +147,16 @@ public class Contact implements ContactMethods {
     	contact.additionalFields.put(FieldName, FieldValue);
     }
     public void updateAdditionalMobileNumber(Contact contact,String Number,String NumberFiled ) {
-    	contact.AdditionalMobileNo.put(Number,NumberFiled);
+    	contact.AdditionalMobileNo.put(NumberFiled,Number);
     }
     public void updateNotes(Contact contact,String notes ) {
-    	contact.Notes.append(notes);
+    	if(contact.Notes == null) {
+    		contact.Notes = new StringBuffer();
+    		contact.Notes.append(notes);
+    	}
+    	else {
+    		contact.Notes.append(notes);
+    	}
     }
     public String removeExistingContact(Contact contact) {
     	return contact.primaryMobileNo;
@@ -161,7 +207,7 @@ public class Contact implements ContactMethods {
     		System.out.println(contact.additionalFields);
     	}
     }
-    public static boolean checkFieldAvailable(String field_name, Hashmap<String,String> dynamicHash){
+    public boolean checkFieldAvailable(String field_name, Hashmap<String,String> dynamicHash){
     	if(dynamicHash != null){
 			Object[] additional = dynamicHash.getKey();
 			for(Object key :  additional) {
@@ -186,7 +232,35 @@ public class Contact implements ContactMethods {
     		
         return false;        
     }
-    public static void ExportContacts(Hashmap<String, Contact> ContactList,String headderField) {
+    
+	
+}
+class ContactApplication {
+    public  String ifExist(Hashmap<String, Contact> ContactList,String MobileNumber,String status) {
+    	for(Object contactObject : ContactList.getValue()) {
+    		Contact contact= (Contact) contactObject;
+    		if(contactObject != null) {
+	    		if(contact.ifExists(contact, MobileNumber)) {
+	    			if(status == "search") {
+	    				return "yes";
+	    			}
+	    			else if(status == "remove") {
+	    				return contact.removeExistingContact(contact);
+	    			}
+	    		}
+    		}
+    	}
+        return "no";
+    }
+    public  boolean checkFieldContains(String[] headder,String field) {
+    	for (String ColunmField : headder) {
+    		if( ColunmField.equals(field)) {
+    			return(true);
+    		}
+    	}
+    	return(false);
+    }
+    public void ExportContacts(Hashmap<String, Contact> ContactList,String headderField) {
     	String Headder = "FullName DateOfBirth PrimaryNumber Group Notes Address City Country PostalCode " + headderField;
     	String[] additionalHeadderArray = headderField.split(" ");
 		try {
@@ -198,59 +272,59 @@ public class Contact implements ContactMethods {
 		    		String additionalNumber = "",sociaMedia = "",additionalField = "";
 		    		if(contactObject != null) {
 		    			ContactBook.append("\n");
-		    			ContactBook.append(contact.firstName + contact.lastName + " ");
-		    			if(contact.dateOfBirth != null) {
-		    				ContactBook.append(contact.dateOfBirth + " ");
+		    			ContactBook.append(contact.getcontactElements(contact, "firstName")  + contact.getcontactElements(contact, "lastName") + " ");
+		    			if(contact.getcontactElements(contact, "dob") != null) {
+		    				ContactBook.append(contact.getcontactElements(contact, "dob") + " ");
 		    			}
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			ContactBook.append(contact.primaryMobileNo + " ");
-		    			if(contact.group != null) {
-		    				ContactBook.append(contact.group + " ");
+		    			ContactBook.append(contact.getcontactElements(contact, "primaryMobileNo") + " ");
+		    			if(contact.getcontactElements(contact, "group") != null) {
+		    				ContactBook.append(contact.getcontactElements(contact, "group") + " ");
 		    			}
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			if(contact.Notes != null) {
-		    				ContactBook.append(contact.Notes + " ");
+		    			if(contact.getNotes(contact) != null) {
+		    				ContactBook.append(contact.getNotes(contact) + " ");
 		    			}
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			if(contact.addressDetails.address != null) {
-		    				ContactBook.append(contact.addressDetails.address.replace(" ","") + " ");
+		    			if(contact.getcontactElements(contact, "address") != null) {
+		    				ContactBook.append(contact.getcontactElements(contact, "address").replace(" ","") + " ");
 		    			}
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			if(contact.addressDetails.city != null) {
-		    				ContactBook.append(contact.addressDetails.city.replace(" ","") + " ");
+		    			if(contact.getcontactElements(contact, "city") != null) {
+		    				ContactBook.append(contact.getcontactElements(contact, "city").replace(" ","") + " ");
 		    			}
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			if(contact.addressDetails.country != null) {
-		    				ContactBook.append(contact.addressDetails.country.replace(" ","") + " ");
+		    			if(contact.getcontactElements(contact, "country") != null) {
+		    				ContactBook.append(contact.getcontactElements(contact, "country").replace(" ","") + " ");
 		    			}
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
-		    			if(contact.addressDetails.postalCode != null) {
-		    				ContactBook.append(contact.addressDetails.postalCode.replace(" ","") + " ");
+		    			if(contact.getcontactElements(contact, "postal") != null) {
+		    				ContactBook.append(contact.getcontactElements(contact, "postal").replace(" ","") + " ");
 		    			}
 		    			else {
 		    				ContactBook.append(" ");
 		    			}
 		    			for(String fields :additionalHeadderArray){
-		    				if(checkFieldAvailable(fields, contact.AdditionalMobileNo)) {
-		    					ContactBook.append(contact.AdditionalMobileNo.get(fields).replace(" ","") + " ");
+		    				if(contact.checkFieldAvailable(fields, contact.getcontactElementsMap(contact, "AdditionalMobileNo"))) {
+		    					ContactBook.append(contact.getcontactElementsMap(contact, "AdditionalMobileNo").get(fields).replace(" ","") + " ");
 		    				}
-		    				else if(checkFieldAvailable(fields, contact.SocialNetworks)) {
-		    					ContactBook.append(contact.SocialNetworks.get(fields).replace(" ","") + " ");
+		    				else if(contact.checkFieldAvailable(fields, contact.getcontactElementsMap(contact, "SocialMedia"))) {
+		    					ContactBook.append(contact.getcontactElementsMap(contact, "SocialMedia").get(fields).replace(" ","") + " ");
 		    				}    				
-		    				else if(checkFieldAvailable(fields, contact.additionalFields)) {
-		    					ContactBook.append(contact.additionalFields.get(fields).replace(" ","") + " ");
+		    				else if(contact.checkFieldAvailable(fields,contact.getcontactElementsMap(contact, "Additionalfield"))) {
+		    					ContactBook.append(contact.getcontactElementsMap(contact, "Additionalfield").get(fields).replace(" ","") + " ");
 		    				}
 		    				else {
 		    					ContactBook.append(" ");
@@ -269,56 +343,7 @@ public class Contact implements ContactMethods {
 			e.printStackTrace();
 		}
 	}
-	
-}
-class ContactApplication {
-    public static String ifExist(Hashmap<String, Contact> ContactList,String MobileNumber,String status) {
-    	for(Object contactObject : ContactList.getValue()) {
-    		Contact contact= (Contact) contactObject;
-    		if(contactObject != null) {
-	    		if(contact.ifExists(contact, MobileNumber)) {
-	    			if(status == "search") {
-	    				return "yes";
-	    			}
-	    			else if(status == "remove") {
-	    				return contact.removeExistingContact(contact);
-	    			}
-	    		}
-    		}
-    	}
-        return "no";
-    }
-    public static boolean checkFieldContains(String[] headder,String field) {
-    	for (String ColunmField : headder) {
-    		if( ColunmField.equals(field)) {
-    			return(true);
-    		}
-    	}
-    	return(false);
-    }
-//    public static boolean validateMobileNumber(Long MobileNumber) {
-//    	String Mobilenumber = String.valueOf(MobileNumber);
-//    	if(Mobilenumber.length() > 10 || Mobilenumber.length() < 10) {
-//    		return false;
-//    	}
-//    	else {
-//    		if(Mobilenumber.charAt(0) != '6' && Mobilenumber.charAt(0) != '7' && Mobilenumber.charAt(0) != '8' && Mobilenumber.charAt(0) != '9' ) {
-//    			return false;
-//    		}
-//    	}
-//		return true;    
-//    while(true) {
-//    	
-//   		if(validateMobileNumber(additionalMobileNumber)) {
-//   			break;
-//   		}
-//   		else {
-//   			System.out.println("Invalid Mobile Number, Please Enter Valid Mobile Number");
-//   		}
-//   	}
-//    }
-//    
-    public static String inputFunction(Scanner userInput,String[] Headder) {
+    public  String inputFunction(Scanner userInput,String[] Headder) {
     	String filedData = "";
     	while(true) {
 			System.out.println("Enter the field name");
@@ -332,8 +357,34 @@ class ContactApplication {
 		}
     	return filedData;
     }
+    public void searchContact(Hashmap<String, Contact> contactList,String searchvalue) {
+    	int flag = 0;
+    	for(Object value : contactList.getValue()) {
+    		Contact contact = (Contact) value;
+    		if(contact.getcontactElements(contact, "firstName").startsWith(searchvalue)) {
+    			contact.viewContact(contact);
+    			flag += 1;
+    		}
+    		else if(contact.getcontactElements(contact, "primaryMobileNo").startsWith(searchvalue)) {
+    			contact.viewContact(contact);
+    			flag += 1;
+    		}
+    		else {
+    			Hashmap<String, String> AdditionalMobileNo = contact.getcontactElementsMap(contact, "AdditionalMobileNo");
+    			for(Object mobileNumber : AdditionalMobileNo.getValue() ) {
+    				String MobileNumber = String.valueOf(mobileNumber);
+    				if(MobileNumber.startsWith(searchvalue)) {
+    					flag += 1;
+    					contact.viewContact(contact);
+    				}
+    			}    			
+    		}
+    	}
+    	System.out.println("Search Result is " + flag);
+    }
     public static void main(String[] args) {
         Scanner userInput = new Scanner(System.in);
+        ContactApplication contactApp = new ContactApplication();
         Hashmap<String, Contact> Contactlist = new Hashmap<String,Contact>(); 
         int choice = 0;
         String primaryMobileNo = null;
@@ -363,7 +414,7 @@ class ContactApplication {
 	                dateOfBirth = userInput.nextLine();
 	                System.out.println("Enter the Person Primary Mobile Number");
 	                primaryMobileNo = userInput.nextLine();
-	               	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals("yes")  )
+	               	if(Contactlist.ifExist(primaryMobileNo) || contactApp.ifExist(Contactlist, primaryMobileNo,"search").equals("yes")  )
 	               	{
 	               		System.err.println("Mobile Number Already Exists You can Update by clicking 4");
 	               	}
@@ -381,7 +432,7 @@ class ContactApplication {
 		                    	
 		                        System.out.println("Enter the Person Mobile Number :");
 		                        additionalMobileNumber = userInput.nextLine();
-		                    	if(Contactlist.ifExist(additionalMobileNumber) || ifExist(Contactlist, additionalMobileNumber,"search").equals("yes") || AdditionalMobileNo.ifExist(additionalMobileNumber) || additionalMobileNumber.equals(primaryMobileNo) )
+		                    	if(Contactlist.ifExist(additionalMobileNumber) || contactApp.ifExist(Contactlist, additionalMobileNumber,"search").equals("yes") || AdditionalMobileNo.ifExist(additionalMobileNumber) || additionalMobileNumber.equals(primaryMobileNo) )
 		    	               	{
 		    	               		System.err.println("Mobile Number Already Exists You can Update by clicking 4");
 		    	               	}
@@ -537,14 +588,14 @@ class ContactApplication {
             	try {
             		userInput.nextLine();
             		String searchpreffix = userInput.nextLine();
-	            	Contact.searchContact(Contactlist,searchpreffix );
+	            	contactApp.searchContact(Contactlist,searchpreffix );
 	            	System.out.println("Please Enter the Person Primary Mobile Number");
             		primaryMobileNo = userInput.nextLine();
 	            	if(Contactlist.ifExist(primaryMobileNo)) {
 	            		Contactlist.remove(primaryMobileNo);
 	            	}
 	            	else {
-	            		primaryMobileNo = ifExist(Contactlist, primaryMobileNo,"remove");
+	            		primaryMobileNo = contactApp.ifExist(Contactlist, primaryMobileNo,"remove");
 	            		Contactlist.remove(primaryMobileNo);
 	            	}
             	}catch (InputMismatchException e) {
@@ -560,16 +611,16 @@ class ContactApplication {
             	try {
             		userInput.nextLine();
             		String searchpreffix = userInput.nextLine();
-	            	Contact.searchContact(Contactlist,searchpreffix );
+	            	contactApp.searchContact(Contactlist,searchpreffix );
 	            	System.out.println("Please Enter the Person Primary Mobile Number");
             		primaryMobileNo = userInput.nextLine();
 	            	Contact contact;
-	            	if(Contactlist.ifExist(primaryMobileNo) || ifExist(Contactlist, primaryMobileNo,"search").equals(1L)) {
+	            	if(Contactlist.ifExist(primaryMobileNo) || contactApp.ifExist(Contactlist, primaryMobileNo,"search").equals(1L)) {
 	            		if(Contactlist.ifExist(primaryMobileNo)) {
 	            			contact = Contactlist.get(primaryMobileNo);
 	            		}
 	            		else {
-	            			primaryMobileNo = ifExist(Contactlist, primaryMobileNo,"remove");
+	            			primaryMobileNo = contactApp.ifExist(Contactlist, primaryMobileNo,"remove");
 	            			contact = Contactlist.get(primaryMobileNo);
 	            		}
 	            		contact.viewContact(contact);
@@ -633,7 +684,7 @@ class ContactApplication {
 		                    
 		                        System.out.println("Enter the Person Mobile Number :");
 		                        String additionalMobileNumber = userInput.nextLine();
-		                    	if(Contactlist.ifExist(additionalMobileNumber) || ifExist(Contactlist, additionalMobileNumber,"search").equals("yes") || AdditionalMobileNo.ifExist(additionalMobileNumber) || additionalMobileNumber.equals(primaryMobileNo) )
+		                    	if(Contactlist.ifExist(additionalMobileNumber) || contactApp.ifExist(Contactlist, additionalMobileNumber,"search").equals("yes") || AdditionalMobileNo.ifExist(additionalMobileNumber) || additionalMobileNumber.equals(primaryMobileNo) )
 		    	               	{
 		    	               		System.err.println("Mobile Number Already Exists You can Update by clicking 4");
 		    	               	}
@@ -662,7 +713,6 @@ class ContactApplication {
 	                    System.out.println("If You Need to add Any Notes for Remainder just press 1 else press 0");
 		                choice = userInput.nextInt();
 		                if (choice == 1) {
-		                	notes = new StringBuffer();
 		                    while (choice == 1) {	
 		                        if (choice == 1) {
 		                            System.out.println("Enter the Notes :");
@@ -720,7 +770,6 @@ class ContactApplication {
 						System.out.println("If You Need to update Additional Fields just press 1 else press 0");
 		                choice = userInput.nextInt();
 		                if (choice == 1) {
-		                	additionalFields = new Hashmap<String, String>();
 		                    while (choice == 1) {
 		                        if (choice == 1) {
 		                            String FieldName, FieldValue;
@@ -759,7 +808,7 @@ class ContactApplication {
             		userInput.nextLine();
             		String searchpreffix = userInput.nextLine();
 	            	Contact contact;
-	            	Contact.searchContact(Contactlist,searchpreffix );
+	            	contactApp.searchContact(Contactlist,searchpreffix );
 	            	}catch (InputMismatchException e) {
 	            	System.out.println("Invalid Input");	
 	            	userInput.nextLine();
@@ -778,7 +827,7 @@ class ContactApplication {
             			headders += field + " ";
             		}
             	}
-            	Contact.ExportContacts(Contactlist,headders);
+            	contactApp.ExportContacts(Contactlist,headders);
             }
             else if(choice == 7) {
             	File ContactFile = new File("C:\\Users\\deeve\\OneDrive\\Desktop\\File Handling\\format.csv");
@@ -821,7 +870,7 @@ class ContactApplication {
 	    						while(true) {
 	    							System.out.println("Primary Number is Mandatory Map with Contact Book Field");
 	    							filedData = userInput.nextLine();
-	    							if(checkFieldContains(Headder,filedData)) {
+	    							if(contactApp.checkFieldContains(Headder,filedData)) {
 	    								break;
 	    							}
 	    							else {
@@ -832,7 +881,7 @@ class ContactApplication {
 	    						while(true) {
 	    							System.out.println("Map First Name Field with Contact Book");
 	    							filedData = userInput.nextLine();
-	    							if(checkFieldContains(Headder,filedData)) {
+	    							if(contactApp.checkFieldContains(Headder,filedData)) {
 	    								break;
 	    							}
 	    							else {
@@ -843,7 +892,7 @@ class ContactApplication {
 	    						while(true) {
 	    							System.out.println("Map Last Name Field with Contact Book");
 	    							filedData = userInput.nextLine();
-	    							if(checkFieldContains(Headder,filedData)) {
+	    							if(contactApp.checkFieldContains(Headder,filedData)) {
 	    								break;
 	    							}
 	    							else {
@@ -855,63 +904,63 @@ class ContactApplication {
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "DOB");
 	    						}
 	    						System.out.println("If you need to map with Group Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "group");
 	    						}
 	    						System.out.println("If you need to map with Notes Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData =contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "Notes");
 	    						}
 	    						System.out.println("If you need to map with Address Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "Address");
 	    						}
 	    						System.out.println("If you need to map with City Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "City");
 	    						}
 	    						System.out.println("If you need to map with Country Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "Country");
 	    						}
 	    						System.out.println("If you need to map with PostalCode Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "PostalCode");
 	    						}
 	    						System.out.println("If you need to map with email Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "email");
 	    						}
 	    						System.out.println("If you need to map with web Field press 1 for skip press 0");
 	    						choice = userInput.nextInt();
 	    						if(choice == 1) {
 	    							userInput.nextLine();
-	    							filedData = inputFunction(userInput, Headder); 
+	    							filedData = contactApp.inputFunction(userInput, Headder); 
 	    							Mapfield.put(filedData, "web");
 	    						}
 	    						while(true) {
@@ -919,7 +968,7 @@ class ContactApplication {
 	    							choice = userInput.nextInt();
 	    							if(choice == 1) {
 	    								userInput.nextLine();
-	    								filedData = inputFunction(userInput, Headder); 
+	    								filedData = contactApp.inputFunction(userInput, Headder); 
 	    								Mapfield.put(filedData, "AdditionalNumber");
 	    							}
 	    							else {
@@ -931,7 +980,7 @@ class ContactApplication {
 	    							choice = userInput.nextInt();
 	    							if(choice == 1) {
 	    								userInput.nextLine();
-	    								filedData = inputFunction(userInput, Headder); 
+	    								filedData = contactApp.inputFunction(userInput, Headder); 
 	    								Mapfield.put(filedData, "Additional");
 	    							}
 	    							else {
