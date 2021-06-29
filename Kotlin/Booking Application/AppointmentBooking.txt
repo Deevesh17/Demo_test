@@ -2,27 +2,38 @@ package com.example.kotlin
 
 import java.lang.NullPointerException
 import java.util.*
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class Service{
     private var service_name : String = ""
-    private var service_duration : Double = 0.0
+    private var service_duration : Long = 0
     private var service_cost : Long = 0
     private var service_provider = arrayListOf<Staff?>()
-    constructor(service_name : String ,service_duration : Double , service_cost : Long) {
+    constructor(service_name : String ,service_duration : Long , service_cost : Long) {
         this.service_name = service_name
         this.service_duration = service_duration
         this.service_cost = service_cost
     }
     fun addServiceProvider(service: Service, service_provider: Staff?){
         service.service_provider.add(service_provider)
-        println(service.service_provider)
     }
-    fun returnStaffDetals(service : Service){
+    fun returnStaffDetals(service : Service) : Int{
+        var count : Int = 0
         for(staff_name in service.service_provider){
             if(staff_name != null){
-                println( " ${staff_name!!.getFieldName(staff_name,"staff_full_name")} : ${staff_name!!.getFieldName(staff_name,"staff_full_name")} ")
+                count++
+                println( "    ${staff_name!!.getFieldName(staff_name,"staff_full_name")} : ${staff_name!!.getFieldName(staff_name,"staff_id")} ")
             }
         }
+        return count
+    }
+    fun getFieldName(service : Service, fieldName : String) : Any{
+        when(fieldName){
+            "service_duration" -> return (service.service_duration)
+            "service_cost" -> return (service.service_cost)
+        }
+        return ""
     }
 }
 class Staff{
@@ -30,10 +41,10 @@ class Staff{
     private var staff_first_name : String = ""
     private var staff_last_name : String = ""
     private var staff_working_hours : String = ""
-    private var start_time : String = ""
-    private var  end_time : String = ""
+    private var start_time : LocalTime = LocalTime.now()
+    private var  end_time : LocalTime = LocalTime.now()
     private var staff_service = arrayListOf<Service?>()
-    constructor(staff_first_name : String,staff_last_name : String,staff_working_hours : String,start_time : String,end_time : String,staff_id : String){
+    constructor(staff_first_name : String,staff_last_name : String,staff_working_hours : String,start_time : LocalTime,end_time : LocalTime,staff_id : String){
         this.staff_id = staff_id
         this.staff_first_name = staff_first_name
         this.staff_last_name = staff_last_name
@@ -43,12 +54,13 @@ class Staff{
     }
     fun addService(staff: Staff, staff_service: Service?){
         staff.staff_service.add(staff_service)
-        println(staff.staff_service)
     }
     fun getFieldName(staff : Staff, fieldName : String) : Any{
         when(fieldName){
             "staff_full_name" -> return (staff.staff_first_name + " " + staff.staff_last_name)
             "staff_id" -> return (staff.staff_id)
+            "start_time" -> return (staff.start_time)
+            "end_time" -> return (staff.end_time)
         }
         return ""
     }
@@ -67,6 +79,22 @@ class Customer{
         this.customer_first_name = customer_first_name
         this.customer_last_name = customer_last_name
         this.customer_mobile_number = customer_mobile_number
+    }
+    fun bookingDetails(booking_time: String, booking_service: String, staff_for_service: String){
+        this.booking_service = booking_service
+        this.booking_time = booking_time
+        this.staff_for_service = staff_for_service
+    }
+    fun getFieldName(customer : Customer, fieldName : String) : Any{
+        when(fieldName){
+            "fullname" -> return (customer.customer_first_name + " " + customer.customer_last_name)
+            "customerId" -> return (customer.Customer_id)
+            "customer_mobile_number" -> return (customer.customer_mobile_number)
+            "booking_time" -> return (customer.booking_time)
+            "booking_service" -> return (customer.booking_service)
+            "staff_for_service" -> return (customer.staff_for_service)
+        }
+        return ""
     }
 }
 fun GetFromUserString(userInput : Scanner, InputFieldName : String) : String{
@@ -89,34 +117,36 @@ fun main() {
     var customer_count : Long = 10001
     var staff_count : Long = 10001
     var service_name : String = ""
-    var service_duration : Double = 0.0
+    var service_duration : Long = 0
     var service_cost : Long = 0
     var first_name : String = ""
     var last_name : String = ""
     var staff_working_hours : String = ""
-    var start_time : String = ""
-    var end_time : String = ""
+    var start_time : LocalTime = LocalTime.now()
+    var end_time : LocalTime = LocalTime.now()
     var customer_mobile_number : Long = 0
     var userChoice = 0
-    fun serviceAvailable(){
+    fun serviceAvailable() : Int{
+        var count : Int = 0
         for (service in serviceList.keys)
         {
-            println(service)
+            count++
+            println("    $service")
         }
+        return count
     }
     while(true){
-        println("1.Create Service.\n2.Create Staff.\n3.Create Customer.\n4.Book Appointment")
+        println("1.Create Service.\n2.Create Staff.\n3.Create Customer.\n4.Book Appointment.\n5.Forget Id")
         try {
             userChoice = userInput.nextInt()
             if (userChoice == 1) {
                 try {
                     userInput.nextLine()
                     service_name = GetFromUserString(userInput, "Service Name")
-                    service_duration = GetFromUserDouble(userInput, "Service Duration in minutes")
+                    service_duration = GetFromUserLong(userInput, "Service Duration in minutes")
                     service_cost = GetFromUserLong(userInput, "Cost for Service")
                     var service = Service(service_name, service_duration, service_cost)
                     serviceList.put(service_name, service)
-                    println(serviceList)
                 } catch (e: Exception) {
                     userInput.nextLine();
                     println("Invalid Input")
@@ -125,10 +155,15 @@ fun main() {
                 userInput.nextLine()
                 first_name = GetFromUserString(userInput, "Staff First Name")
                 last_name = GetFromUserString(userInput, "Staff Last Name")
-                staff_working_hours =
-                    GetFromUserString(userInput, "Staff Working Hours (eg : 8-Hrs)")
-                start_time = GetFromUserString(userInput, "Starting Time (eg : 10-AM)")
-                end_time = GetFromUserString(userInput, "End Time(eg : 7-PM)")
+                staff_working_hours = GetFromUserString(userInput, "Staff Working Hours (eg : 8-Hrs)")
+                var working_hrs = staff_working_hours.split("-")
+                var startTime = GetFromUserString(userInput, "Starting Time (eg : 10-AM)").split("-")
+                var time : Int = startTime[0].toInt()
+                if(startTime[1].lowercase().equals("pm")){
+                    time += 12
+                }
+                start_time = LocalTime.of(time,0,0)
+                end_time = start_time.plusHours(working_hrs[0].toLong())
                 var staff = Staff(
                     first_name,
                     last_name,
@@ -138,17 +173,22 @@ fun main() {
                     first_name + staff_count
                 )
                 println("Service Available, if your service not in list you can create by Create Service...")
-                serviceAvailable()
-                try {
-                    service_name = GetFromUserString(userInput, "Service Name")
-                    staff.addService(staff, serviceList.get(service_name))
-                    staffList.put(first_name + staff_count, staff)
-                    var service = serviceList.get(service_name)
-                    service!!.addServiceProvider(service, staff)
-                    staff_count++
-                    println(staffList)
-                } catch (e: NullPointerException) {
-                    println("service your entered is not available")
+                var flag : Int = serviceAvailable()
+                if(flag > 0 ) {
+                    try {
+                        service_name = GetFromUserString(userInput, "Service Name")
+                        staff.addService(staff, serviceList.get(service_name))
+                        staffList.put(first_name + staff_count, staff)
+                        var service = serviceList.get(service_name)
+                        service!!.addServiceProvider(service, staff)
+                        println("Here's your Staff ID : ${first_name + staff_count}")
+                        staff_count++
+                    } catch (e: NullPointerException) {
+                        println("service your entered is not available")
+                    }
+                }
+                else{
+                    println("There is No Available Service")
                 }
             } else if (userChoice == 3) {
                 userInput.nextLine()
@@ -168,16 +208,113 @@ fun main() {
             } else if (userChoice == 4) {
                 userInput.nextLine()
                 println("Service Available, if your service not in list you can create by Create Service...")
-                serviceAvailable()
-                try {
-                    service_name = GetFromUserString(userInput, "Select Service available")
-                    var service = serviceList.get(service_name)
-                    service!!.returnStaffDetals(service)
-                    var staff_id = GetFromUserString(userInput, "Select Staff ID")
-                    var staff = staffList.get(staff_id)
-                    println(Calendar.getInstance())
-                } catch (e: NullPointerException) {
-                    println("service your entered is not available")
+                var flag: Int = serviceAvailable()
+                if (flag > 0) {
+                    try {
+                        service_name = GetFromUserString(userInput, "Select Service available")
+                        var service = serviceList.get(service_name)
+                        var flag: Int = service!!.returnStaffDetals(service)
+                        if (flag > 0) {
+                            var staff_id = GetFromUserString(userInput, "Select Staff ID")
+                            var staff = staffList.get(staff_id)
+                            var currenttime = LocalTime.now()
+                            var start_time = staff!!.getFieldName(staff, "start_time") as LocalTime
+                            var end_time = staff!!.getFieldName(staff, "end_time") as LocalTime
+                            var duration: Long = service!!.getFieldName(service, "service_duration") as Long
+                            var flag = 0
+                            println("Available sloat is :")
+                            if (currenttime >= start_time && currenttime <= end_time) {
+                                var duration_between = currenttime.plusMinutes(duration)
+                                do  {
+                                    var simple = DateTimeFormatter.ofPattern("hh:mm a")
+                                    var startduration = duration_between
+                                    duration_between = duration_between.plusMinutes(duration)
+                                    if(duration_between > end_time )
+                                    {
+                                        break
+                                    }
+                                    println("  ${startduration.format(simple) }  - ${duration_between.format(simple)}")
+                                    flag++
+                                }while(duration_between < end_time);
+                                if(flag != 0) {
+                                    var timeSlot =
+                                        GetFromUserString(userInput, "time slot from above list")
+                                    var Customer_id = GetFromUserString(userInput, "Customer ID")
+                                    var customer = customerList.get(Customer_id)
+                                    try {
+                                        customer!!.bookingDetails(
+                                            timeSlot,
+                                            service_name,
+                                            staff!!.getFieldName(staff, "staff_full_name") as String
+                                        )
+                                        println(
+                                            "Booking Status...\n\tCustomer Id : ${
+                                                customer.getFieldName(
+                                                    customer,
+                                                    "customerId"
+                                                )
+                                            },\n" +
+                                                    "\tCustomer Name : ${
+                                                        customer.getFieldName(
+                                                            customer,
+                                                            "fullname"
+                                                        )
+                                                    },\n" +
+                                                    "\tCustomer Mobile Number : ${
+                                                        customer.getFieldName(
+                                                            customer,
+                                                            "customer_mobile_number"
+                                                        )
+                                                    },\n" +
+                                                    "\tCustomer Booking Time : ${
+                                                        customer.getFieldName(
+                                                            customer,
+                                                            "booking_time"
+                                                        )
+                                                    },\n" +
+                                                    "\tCustomer Booking Service : ${
+                                                        customer.getFieldName(
+                                                            customer,
+                                                            "booking_service"
+                                                        )
+                                                    },\n" +
+                                                    "\tStaff for the Service : ${
+                                                        customer.getFieldName(
+                                                            customer,
+                                                            "staff_for_service"
+                                                        )
+                                                    }"
+                                        )
+                                    } catch (e: NullPointerException) {
+                                        println("Customer Id your entered is not available You can Know You Customer id by Forget Id")
+                                    }
+                                }
+                            }
+                        } else {
+                            println("There is No Available Staff for this Service")
+                        }
+                    } catch (e: NullPointerException) {
+                        println("service your entered is not available")
+                    }
+                }
+                else{
+                    println("There is No Available Service")
+                }
+            }
+            else if(userChoice == 5){
+                customer_mobile_number = GetFromUserLong(userInput,"Mobile Number")
+                var flag = 0
+                for(customer in customerList.values)
+                {
+                    var mobileNumber = customer.getFieldName(customer,"customer_mobile_number") as Long
+                    if(mobileNumber.equals(customer_mobile_number)){
+                        println("Here's Your Customer Id : ${ customer.getFieldName(customer, "customerId")}")
+                        flag = 1
+                        break
+                    }
+                }
+                if(flag == 0){
+                    println("There is No customer linked with this Mobile Number $customer_mobile_number")
                 }
             }
         }
@@ -186,7 +323,6 @@ fun main() {
             println("Invalid Input")
         }
         catch (E : Exception){
-            userInput.nextLine();
             println("Exception Occurs $E")
         }
     }
